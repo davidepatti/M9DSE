@@ -22,7 +22,6 @@ add_executable(M9DSE
         alg_genetic.cpp
         alg_random.cpp
         alg_sensivity.cpp
-        cacti_area_interface.h
         common.cpp
         common.h
         environment.h
@@ -37,10 +36,8 @@ add_executable(M9DSE
         hash.h
         main.cpp
         Makefile
-        MPI.README
         parameter.cpp
         parameter.h
-        post_install.sh
         model_inverter.cpp
         model_inverter.h
         RuleList.cpp
