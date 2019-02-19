@@ -1,0 +1,501 @@
+r*************************************************************
+	EPIC Explorer - Installing instructions
+**************************************************************
+      			         Last update Sep 24th, 2013
+		        by Davide Patti (davide.patti@dieei.unict.it)
+
+==============================================================
+SECTION I: REQUIREMENTS
+==============================================================
+
+This version of epic explorer will work on Trimaran version 4.0. So
+ALL trimaran 4.0 requirement are ALSO epic explorer requirements. The
+exact type of software packages to be installed are specified in the
+trimaran manual.
+
+If you need to use older versions of trimaran please download a
+previous versione of epic explorer (i.e.  20060312-r2 version works
+with trimaran 3.7)
+
+******** important !!! *****************************************
+If compiling for AMD64 architectures (e.g. Opteron) with a 64
+bit distribution, see also the specific notes at the Appendix of this
+document.
+
+If you want to use the MPI feature of Epic Explorer to exploit
+parallelism during exploration, please refer also to the MPI.README
+file provided in the source directory.
+
+==============================================================
+SECTION II: INSTALLING TRIMARAN 
+==============================================================
+
+                     *** IMPORTANT! ****
+
+Before reporting ANY bug or problem see both APPENDIX I and II at the
+end of this document.
+                        **********
+
+First of all, you have to install the Trimaran compiler framework.
+Now, please follow carefully these steps:
+
+STEP 1:
+
+Download Trimaran 4.0 from http://www.trimaran.org/download.shtml
+
+STEP 2: 
+
+Unpack the trimaran archive. A good choice is usually to put it in your
+home directory:
+
+tar xvfz trimaran.tgz
+
+We will refer to the chosen dir as <TRDIR>.
+
+STEP 3: 
+
+If not yet done, download Epic Explorer source from
+https://code.google.com/p/epic-explorer/
+
+tar xvfz epic-VERSION.tar.gz 
+
+We will refer to the directory containing epic explorer source as
+<EPIC_DIR>
+
+STEP 4: 
+
+Copy the file 'PD_m5e.c' from <EPIC_DIR>/MISC_FILES/ to
+<TRDIR>/simu/src/emulib/
+
+    NOTE 4.1: If both epic and trimaran sources have been unpacked inside your home
+    directory as suggested, the following command will probably work:
+
+    cp -f ~/epic/MISC_FILES/PD_m5e.c ~/trimaran/simu/src/emulib/
+
+STEP 5: 
+
+Now you can proceed with the normal trimaran installation.  Follow the
+istructions of section 2 'Manual Installation' of the pdf manual found
+in the trimaran/manual directory. Proceed to the next step only after
+trimaran has been correctly installed.  
+
+IMPORTANT 1: you should start from point 4 of  subsection 2.2, in other
+words, you should NOT unpack *again* the source, because this would
+overwrite the new PD_m5e.c copied in the previous step 4)
+
+IMPORTANT 2: As regards point 4 of subsection 2.2, if you are using a
+GNU/Linux based system and you unpacked sources in the home directory,
+you probably should NOT modify the envrc.bash script, but just give a
+command:
+
+    source ~/trimaran/scripts/envrc.bash
+
+in every shell where you want to use trimaran. In order to avoid to retype this
+command in every new shell opened, add the 'source...' command to the .bashrc,
+as suggested in the same section of the manual.  So, in most cases, if you
+installed trimaran in you home directory, simply add that line at the end of
+your .bashrc file inside your home.
+A simple way to accomplish this is typing the command:
+
+echo "source ~/trimaran/scripts/envrc.bash" >> .bashrc
+
+IMPORTANT FOR UBUNTU USERS: 
+
+As described in the footnote 1 of subsection 2.2 in Trimaran manual ,
+you should avoid using dash shell instead of bash.  To accomplish
+this, simply type:
+sudo dpkg-reconfigure dash 
+and then answer "NO" to the question prompted.
+
+STEP 6: 
+
+If the above step was ok, install M5 memory simulator as explained in
+Section 7 of trimaran manual. If you encounter problems, look a the M5
+SPECIFIC problems at the end of this document (APPENDIX II)
+
+IMPORTANT: as specified in the Trimaran section 7 when discussing M5 
+installation DO NOT forget to enable M5_BUILD flag: on src/emulib
+open the Makefile for editing. Change the value of BUILD M5E from 0 to 1 so that it is
+BUILD_M5E=1
+ 
+    NOTE 1: when typing 'make' into m5 directory, a download of m5
+    tar.gz should start. If not, download it manually from:
+    http://sourceforge.net/projects/m5sim/files/m5sim/m5_1.1.tar.gz/
+    and put the file in the m5 directory.
+
+    NOTE 2: you will probably encounter the errors described in
+    APPENDIX II of this README.
+
+    NOTE 3: if compiling for AMD64 architectures (e.g. Opteron) with a 64
+    bit distribution, see also the specific notes at the appendix of this
+    document.
+
+==============================================================
+SECTION III: INSTALLING EPIC EXPLORER 
+==============================================================
+
+Note: if you used the trick of the gcc 3.x wrappers (described below in
+APPENDIX II) use a new shell in order to have a normal gcc 4.x
+
+1) If not yet done, unpack epic explorer source
+
+2) Enter the epic explorer source directory
+
+3) Just type 'make' to compile the source 
+
+4) If compilation completed successifully, type:
+
+"./post_install.sh" 
+
+from epic source dir. 
+
+This should check if everything is ok and create all the necessary
+files in trimaran-workspace directory. 
+
+Now you should be able to run Epic Explorer executable from
+its source dir simply by typing "./epic".
+
+If all seems ok, skip to next Section IV
+
+    NOTE: 
+    If upgrading from a previous Epic Explorer version for trimaran 3.x,
+    delete all the files in 'trimaran-workspace/epic-explorer/' since they
+    might be incompatible with the new version and cause segfaults.
+
+    In any case, removing or renaming the whole previous trimaran-workspace
+    directory is a safe choice, since the new 'post_install.sh' script
+    creates everything needed.
+
+    NOTE: 
+    If you are *NOT* using an x86 GNU/Linux based system you should edit
+    environment.h to specify the compiler and the platform, using the same
+    values as trimaran/scripts/envrc
+  
+
+==============================================================
+	SECTION IV. USING EPIC EXPLORER
+==============================================================
+
+- start Epic explorer by typing ./epic from source dir
+
+Now, you can use epic in two ways:
+
+(1) USING AN EXPLORATION ALGORITHM:
+
+- Optionally choose preferred setting from 'main' menu. 
+
+- Optionally choose a space or edit a new one from 'design space' menu.
+
+- Choose an design space exploration algorithm from the 'space
+  exploration' menu. 
+  (You can also choose 'x' to sequentially schedule different algorithm
+  on the same space.)
+
+- After each exploration has ended, resulting files are created into
+  trimaran-workspace/epic-explorer/<name_of_benchmark> directory.
+
+(2) PERFORM STEPS MANUALLY
+
+- The 'manual test' menu' shows the steps required for evaluating each
+  single system configuration. The configuration, along with results
+  of the compilation/execution are created in:
+  trimaran-workspace/epic-explorer/step_by_step directory.
+
+
+OUTPUT FILE NAMES 
+  ------------------------
+  - *.exp : exploration files. They contain the values of the estimated
+    objectives and the configurations explored. 
+    
+    The filename format is:
+
+    bench_ALGO_space.exp: set of estimated configurations using
+    design space exploration algorithm 'ALGO' on subspace 'space'
+    running benchmark 'bench'. 
+
+    bench_ALGO_space.pareto.exp: same as above, but this file
+    contains only configurations belonging to the pareto set (e.g.
+    non-dominated configuration representing all possible trade-offs).
+
+    NOTE: For some algorithms you will get multiple .pareto.exp files,
+    each numbered according to the phase when the pareto set was
+    computed (e.g. number of generations in GA).
+
+  - *.stat: statistical files, whose contents depend on the algorithm used.
+
+  - *.est: each of this files contains the estimation details of each
+    single configuration encountered during exploration. Since the
+    number of these files may be very large, this option is disabled
+    by default.
+
+  - PD_STATS_n: this is the raw n-th PD_STATS file generated by
+    Trimaran. Disabled by default, only for epic debug purpose. To see
+    estimation details used by Epic Explorer better use *.est files.
+
+
+==============================================================
+	APPENDIX I: COMMON PROBLEMS AND ERRORS
+==============================================================
+
+This section lists common errors you can experience while trying to
+compile trimaran or epic explorer.
+
+OK, I HAVE A PROBLEM, CAN I ASK YOU ?
+
+IMPORTANT: in order to avoid confusion it's essential that distinguish
+between the problems of *trimaran* and those of *epic explorer*.
+
+In other words: don't mail to trimaran developers if you have problems
+while compiling/using epic explorer. On the other hand, don't bother
+me with problems that are strictly related to compiling trimaran. However i've
+added a list of common Trimaran problems (see below).
+
+> Trimaran support:  http://trimaran.org/support.shtml
+
+> Epic explorer support: davide.patti@dieei.unict.it  (that's me)
+  Please report gcc version, GNU/Linux distribution and any other
+  useful info.
+
+
+LIST OF TRIMARAN-RELATED PROBLEMS
+
+_____ ERROR  _____________________________________
+missing lstc++ , skipping 64 bit version 
+
+>>> SOLUTION:
+On Ubuntu:
+sudo apt-get install ia32-libs
+sudo apt-get install gcc-multilib g++-multilib
+
+_____ ERROR  _____________________________________
+
+Missing 'aclocal'
+
+>>> SOLUTION:
+Install automake !!
+
+____ ERROR ______________________________________
+/usr/include/features.h:323:26: fatal error: bits/predefs.h: No such file or directory
+
+>>> SOLUTION:
+sudo apt-get install libc6-dev-i386
+
+____ ERROR ______________________________________
+getnameinfo(const struct sockaddr *sa, socklen_t salen, char *host,
+      ^
+
+1 error detected in the compilation of "platform/x86lin_gcc/IPA_lib/__impact_lib.i".
+Exiting: non-zero exit code
+
+____ ERROR  _____________________________________
+
+>>> SOLUTION:
+Open the file platform/x86lin_gcc/IPA_lib/__impact_lib.c and go to line NO:
+1943 then in the function getnameinfo( ) change the last parameter from
+unsigned int flags to only int flags then try installing and the software
+openimpact will install successfully.
+
+____ ERROR  _____________________________________
+
+When compilating openimpact, the following error is encountered:
+
+"platform/x86lin_gcc/IPA_lib/__impact_lib.c", line 3244: error: 
+declaration is incompatible with "const char *poptStrerror(const int)" 
+(declared at line 463 of "/usr/include/popt.h")
+  const char * const poptStrerror(const int error)
+
+>>> SOLUTION: 
+
+change the declaration of poptStrerror in the file:
+openimpact/platform/x86lin_gcc/IPA_lib/__impact_lib.c
+
+As suggested, the correct declaration is : 
+  const char * poptStrerror(const int error)
+
+Note:
+
+Usage of gcc >=4.3 leads to some further errors. The solution is
+similar, simply change che declaration of the function in
+__impact_lib.c so that the type of each parameter is exactly the same
+of those declared in /usr/include/popt.h
+
+____  ERROR _____________________________________________
+
+When compiling/executing a benchmark, the following error is
+encountered:
+
+Linking Pcode
+ls: [^_]*.pst: No such file or directory
+ls: _*.pst: No such file or directory
+Plink  -e pstl
+Pcode error: main() not defined
+Exiting: non-zero exit code
+Exiting: non-zero exit code
+tcc: Error: compile_bench -nosync -p ~/trimaran/openimpact/parms/STD_PARMS.IMPACT unsuccessful, bailing out! 
+
+--->SOLUTION:
+
+You should edit the file ~/trimaran/openimpact/scripts/gen_CtoP and
+apply these changes:
+
+- Modify the first line from #!/bin/sh to #!/bin/bash;
+- At line 556 there are two lines containing the words: "for F in ....":
+  delete both lines and replace them with a single line: 
+        for F in `\ls *.pst` ; do FPST="$FPST $F"; done;
+
+
+
+
+*******************************************************
+	APPENDIX II: M5 SPECIFIC PROBLEMS
+*******************************************************
+
+OK, WHAT'S THE QUICK SOLUTION ?
+Go to the "DESPERATE SOLUTIONS" section below...
+
+
+-----------------------------------------------------
+Below you'll find different problems you may enconter while trying to
+compile m5. There are two main reason that causes M5 compilation to be
+sometimes very difficult:
+
+REASON 1) You ARE NOT USING gcc and g++ version 3.4, but only newer version
+(for example 4.x)
+
+REASON 2) You are using a 64bit distribution.
+
+If you match both cases, in other words if you CANNOT/DON'T WANT install gcc and g++
+3.4 and you have a 64 bit distribution, you should probably jump
+directly to the "DESPERATE SOLUTIONS" at the end of this section.
+
+
+PROBLEM 1) I have a 64 bit distribution
+===============================================================
+The problem is quite simple: on 64bit architectures, trimaran tries to
+compile everything with -m32 option passed to gcc.
+So, in order to compile, you should also install packages which
+provide 32bit libraries.
+This packages are (note that name may change):
+gcc-multilib, ia32-libs, libc6-dev-i386
+
+In order to compile trimaran M5 cache simulator on AMD64 bit machines
+with a 64 bit linux distribution some tweaks were required, since all
+the code needs to be compiled in 32 bit mode.
+
+PROBLEM 2) I have a normal 32bit distribution, but using gcc 4.x
+===============================================================
+If is this the case, you'll probably encounter the following
+namespace error:
+
+ALPHA/arch/alpha/decoder.cc:5619: error: definition of 
+‘StaticInstPtr<AlphaISA> AlphaISA::decodeInst(uint32_t)’ is not in 
+namespace enclosing ‘AlphaISA’
+scons: *** [ALPHA/arch/alpha/decoder.os] Error 1
+scons: building terminated because of errors.
+make: *** [install/m5/build/ALPHA/libm5shared.so] Error 2
+
+---> SOLUTION: 
+
+It's simple: gcc4.1 DOES NOT work for M5, you should use version 3.4.
+
+Install gcc and g++ 3.4.  To be sure to compile with version 3.4
+instead of the usual /usr/bin/gcc it's HIGHLY recommended to use the
+two wrapper scripts provided in MISC_FILES/gcc_wrapper so that gcc and
+g++ 3.4 are used when compiling m5.
+
+In other words, JUST for the M5 compilation, put this path BEFORE the standard
+path, for example type this before compiling:
+
+export PATH=<EPIC_DIR>/MISC_FILES/gcc_wrappers:$PATH
+
+Remember: this is needed ONLY for the M5 compilation to be sure that
+the 3.4 version of compiler is invoked.
+After compiling m5, normal gcc 4 should be used (reopen a new shell to
+use the usual PATH value).
+
+PROBLEM 3) 
+===============================================================
+While trying to compile M5 cache simulator,  the following error is
+encountered:
+
+A LOT OF:
+
+trimaran/m5/install/m5/build/ext/libelf/po/de.msg:105: invalid
+character: message ignored
+
+ENDING WITH THE FOLLOWING:
+
+/usr/bin/ld: libelf/lib/libelf.a(begin.o): relocation R_X86_64_32
+against `a local symbol' can not be used when making a shared object;
+rec ompile with -fPIC libelf/lib/libelf.a: could not read symbols: Bad
+value
+
+SOLUTION:
+
+Don't ask me why, but simply re-typing 'make' command works (same as
+PROBLEM 5 below). If not, jump to DESPERATE SOLUTION below.
+
+
+PROBLEM 4) 
+===============================================================
+If you get:
+
+/usr/bin/ld: libelf/lib/libelf.a(begin.o): relocation R_X86_64_32
+against `a local symbol' can not be used when making a shared object;
+recompile with -fPIC
+
+SOLUTION:
+
+you should add -fPIC to the gcc command in the file:
+trimaran/m5/install/m5/build/libelf/lib/Makefile
+
+and launch again the make command inside the
+'trimaran/m5/install/m5/build/libelf/lib/' directory.
+
+and then relaunch the 'ldconfig' command to regenerate the cache of
+library paths.
+
+PROBLEM 5) 
+===============================================================
+If you get:
+m5/build/ext/libelf/po/de.msg:228: invalid character: message ignored
+
+SOLUTION:
+
+Simply re-run the "make" command magically solves the issue.
+
+
+PROBLEM 6)
+===============================================================
+
+/usr/bin/ld: skipping incompatible /usr/lib/libz.a when searching for
+-lz
+/usr/bin/ld: cannot find -lz
+
+That is, you are compiling m5 with the needed gcc 3.x 32bit wrappers,
+but you still miss a compatible 32 libz library.
+
+SOLUTION: on Ubuntu, install lib32z-dev package
+
+
+
+DESPERATE SOLUTION
+================================================================
+If the above solutions don't work you still try two solutions:
+
+1) 
+If you can have access to a standard 32bit machine with a 3.4 gcc and
+g++, you can try to compile m5 there, and then copy resulting file:
+
+trimaran/m5/install/m5/build/m5/build/ALPHA/libm5shared.so 
+
+to the same directory of the not-working machine. In my case it did work!
+Note that while trying to compile m5 on such a standard machine you
+can still have little issues (e.g. the PROBLEM 4 described above), but
+in that case all proposed solutions should work.
+
+2)
+If you are REALLY desperate, you can try to use the libm5shared file
+that you find here in MISC_FILES directory inside epic explorer.
+
+
