@@ -1,18 +1,18 @@
 ------------------------------------------------------
-MPI Epic Explorer HOW-TO
+MPI M9DSE Explorer HOW-TO
 -------------------------------------------------------
 Last updated Nov 20th 2009 by Davide Patti (dpatti@diit.unict.it)
 
 
 Intro
 ------------------------------------------------------
-These instructions will allow an Epic Explorer user to spawn
+These instructions will allow an M9DSE Explorer user to spawn
 simulations among different execution units using Message Passing
 Interface library (MPI).
 
 The aim of the implementation is to be as trasparent as
-possible to the epic explorer user, so that she/he can see only the first
-instance of epic as a normal interactive epic explorer menu, while the
+possible to the M9DSE explorer user, so that she/he can see only the first
+instance of M9DSE as a normal interactive M9DSE explorer menu, while the
 remaining N-1 instances will wait as slave processes.
 Currently tested exploration algorithms: GA, RAND, EXHA.
 
@@ -26,34 +26,34 @@ Note: if possible prefer mpich implementation over openmpi. For
 example, on Ubuntu systems install 'mpich-bin' and 'libmpich1.0-dev'
 packages.
 
-II. Compiling epic explorer with MPI library
+II. Compiling M9DSE explorer with MPI library
 ------------------------------------------------------
-Enter the epic source directory as usual. If you already compiled the
+Enter the M9DSE source directory as usual. If you already compiled the
 source code, run "make cleanall" to remove all previously build files.
 
 Enable the mpi flag by running:
 
-export EPIC_MPI=1
+export M9_MPI=1
 
 Now edit the "Makefile" just to check that the compiler/flags setting
 are good for your MPI installation. 
 The values currently present worked for an Ubuntu 8.04 installation.
 
-After this, you can compile as usual by typing "make" inside epic
+After this, you can compile as usual by typing "make" inside M9
 explorer source directory.
 
 IMPORTANT: the "make" command should be issued ALWAYS from the same
-shell where you previuously exported EPIC_MPI, since environment variables
+shell where you previuously exported M9_MPI, since environment variables
 are not automatically updated in different shells.
 
 
-III. Running Epic Explorer with MPI parallell execution
+III. Running M9DSE Explorer with MPI parallell execution
 ------------------------------------------------------
-Assuming you are inside epic source directory, just issuing the command:
+Assuming you are inside M9DSE source directory, just issuing the command:
 
-mpirun -np N ./epic
+mpirun -np N ./M9
 
-will run N instances of epic, where N must be set depending on your
+will run N instances of M9, where N must be set depending on your
 number of core and/ore MPI configuration (e.g. you could spawn on multiple
 hosts by using machinefile). 
 
@@ -63,23 +63,23 @@ number of configurtion, so that you can quickly check the results.
 
 VERY IMPORTANT!
 ---------
-When running epic with mpirun, it can happens that multiple processes
+When running M9DSE with mpirun, it can happens that multiple processes
 will try to use the same paths. This is ok, but ONLY works if
 save/restore option is enabled.
 Otherwise, the cleaning performed by a process at the end of a simulation could
 interfere with another process that previously found a directory.
 
 To enable the option, change the 'save_restore' to ENABLED in
-trimaran-workspace/epic-explorer/epic_default.conf 
-In alternative, you can start 'epic', set the 'save/restore
-simulations' option, save the changes and restart epic.
+matlab-workspace/M9-explorer/M9_default.conf
+In alternative, you can start 'M9', set the 'save/restore
+simulations' option, save the changes and restart M9.
 
 TIPS
 
 --------
-If you want to un epic non-interactively, e.g. using a command file to
+If you want to un M9DSE non-interactively, e.g. using a command file to
 feed the inputs:
-nohup mpirun -np N ./epic < cmd.txt &
+nohup mpirun -np N ./M9DSE < cmd.txt &
 
 where cmd.txt is a file containing the commands, N the number of
 processors. Prepending the "nohup" command allows the user to

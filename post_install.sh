@@ -2,59 +2,59 @@
 
 # DO NOT CHANGE these paths unless you're sure of what you're doing.
 # The paths below should be coherent with the ones specified into 
-# Epic Eplorer source code and Trimaran sources.
+# M9DSE Eplorer source code and matlab sources.
 
 BASE_DIR=$HOME
-WORKSPACE=$BASE_DIR/trimaran-workspace
-TRIMARAN_ROOT=$BASE_DIR/trimaran
-EPIC_SOURCE=$BASE_DIR/epic
+WORKSPACE=$BASE_DIR/matlab-workspace
+matlab_ROOT=$BASE_DIR/matlab
+M9_SOURCE=$BASE_DIR/M9
 
-# checking trimaran installation ###############################
+# checking matlab installation ###############################
 echo ""
-echo "** Checking for trimaran installation files..."
+echo "** Checking for matlab installation files..."
 
-if [ -e $TRIMARAN_ROOT/scripts ]; then
-   echo "  ** Ok, found a trimaran 4 installation, copying new tcc script..."
-   cp $EPIC_SOURCE/MISC_FILES/tcc $TRIMARAN_ROOT/scripts
+if [ -e $matlab_ROOT/scripts ]; then
+   echo "  ** Ok, found a matlab 4 installation, copying new tcc script..."
+   cp $M9_SOURCE/MISC_FILES/tcc $matlab_ROOT/scripts
 else
-   echo "  > Missing $TRIMARAN_ROOT/scripts directory !"
-   echo "    check your trimaran installation!"
+   echo "  > Missing $matlab_ROOT/scripts directory !"
+   echo "    check your matlab installation!"
    exit 1
 fi
 
 
-# checking epic workspace ######################################
+# checking M9DSE workspace ######################################
 echo "** Checking for necessary files in $WORKSPACE..."
 
-if [ -e $WORKSPACE/epic-explorer ]; then
-   echo "  ** WARNING: found a previous $WORKSPACE/epic-explorer directory"
+if [ -e $WORKSPACE/M9-explorer ]; then
+   echo "  ** WARNING: found a previous $WORKSPACE/M9-explorer directory"
    echo "It's strongly suggested to move/rename it in order to avoid conflicts with "
    echo "newer versions."
    exit -1
 else # missing workspace
-   echo " > Creating $WORKSPACE/epic-explorer directory"
-    mkdir -p $WORKSPACE/epic-explorer
+   echo " > Creating $WORKSPACE/M9-explorer directory"
+    mkdir -p $WORKSPACE/M9-explorer
 fi
 
 echo " > Copying SUBSPACES directory..."
-cp -Rf $EPIC_SOURCE/SUBSPACES $WORKSPACE/epic-explorer
+cp -Rf $M9_SOURCE/SUBSPACES $WORKSPACE/M9-explorer
 
 echo " > Copying m5elements configuration files..."
-cp -Rf $EPIC_SOURCE/MISC_FILES/m5elements $WORKSPACE/epic-explorer/
+cp -Rf $M9_SOURCE/MISC_FILES/m5elements $WORKSPACE/M9-explorer/
 
-echo " > Creating $WORKSPACE/epic-explorer/machines directory..."
-cp -Rf $EPIC_SOURCE/MISC_FILES/machines $WORKSPACE/epic-explorer/
+echo " > Creating $WORKSPACE/M9-explorer/machines directory..."
+cp -Rf $M9_SOURCE/MISC_FILES/machines $WORKSPACE/M9-explorer/
 
-echo " > Creating $WORKSPACE/epic-explorer/step_by_step directory..."
-mkdir -p $WORKSPACE/epic-explorer/step_by_step
+echo " > Creating $WORKSPACE/M9-explorer/step_by_step directory..."
+mkdir -p $WORKSPACE/M9-explorer/step_by_step
 
-cp -Rf $EPIC_SOURCE/MISC_FILES/machines $WORKSPACE/epic-explorer/step_by_step
-cp -Rf $EPIC_SOURCE/MISC_FILES/m5elements $WORKSPACE/epic-explorer/step_by_step 
+cp -Rf $M9_SOURCE/MISC_FILES/machines $WORKSPACE/M9-explorer/step_by_step
+cp -Rf $M9_SOURCE/MISC_FILES/m5elements $WORKSPACE/M9-explorer/step_by_step
 
-echo " > Creating a new epic_default.conf"
-cp -f $EPIC_SOURCE/MISC_FILES/epic_default.conf $WORKSPACE/epic-explorer
+echo " > Creating a new M9_default.conf"
+cp -f $M9_SOURCE/MISC_FILES/M9_default.conf $WORKSPACE/M9-explorer
 
 echo " ** Done. **"
-echo " Just type ./epic to start epic explorer!"
+echo " Just type ./M9DSE to start M9DSE explorer!"
 echo ""
 

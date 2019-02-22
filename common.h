@@ -13,8 +13,8 @@
 #include "hash.h"
 
 // IMPORTANT:
-// you should set this to "DIR" if you install trimaran and
-// trimaran-workspace directories to the content of environment
+// you should set this to "DIR" if you install matlab and
+// matlab-workspace directories to the content of environment
 // variable $DIR
 // DAV #define BASE_DIR "PWD"
 #define BASE_DIR "HOME"
@@ -24,7 +24,7 @@
 #define EXPLORER_HMDES2 "explorer.hmdes2"
 #define COMPILER_PARAM "compiler_param" //db
 #define EE_TAG "\n    >> EE: "
-#define EE_LOG_PATH "/trimaran-workspace/epic-explorer/epic.log"
+#define EE_LOG_PATH "/matlab-workspace/M9-explorer/M9.log"
 #define N_PARAMS 27
 
 // ---------------------------------------------------------------------------
@@ -36,8 +36,8 @@
 #define GAUSSIAN_SET 2
 
 #define BIG_CYCLES      1e30
-#define BIG_ENERGY      1e30
-#define BIG_AREA        1e30
+#define BIG_VGS      1e30
+#define BIG_ID        1e30
 
 // added by andrea.araldo@gmail.com
 // TODO: non so se questo sia il posto giusto per mettere questo
@@ -92,7 +92,7 @@ struct UserSettings
 	string benchmark;
 	bool objective_id;
 	bool objective_vds;
-	bool objective_vgs;
+	bool objective_VGS;
 	bool save_spaces;
 	bool save_estimation;
 	bool save_objectives_details;
@@ -133,7 +133,7 @@ struct GA_parameters
 
 // ---------------------------------------------------------------------------
 // predefined mask types 
-enum Mask_type { SET_ALL, UNSET_ALL, SET_L1D, SET_L1I, SET_L2U, SET_PROCESSOR_UNITS, SET_PROCESSOR,SET_COMPILER }; //db
+enum Mask_type { SET_ALL, UNSET_ALL}; //db
 
 struct Rule {
 	int* antecedents;
@@ -174,8 +174,6 @@ struct Configuration
 	string get_executable_dir() const;
 	string get_mem_dir() const;
 
-	int getParameterValue(EParameterType pt) const;
-	int getParameterValuePosition(EParameterType pt) const;
 	string configuration_to_string() const;
 	//</added by andrea.araldo@gmail.com>
 
@@ -183,26 +181,26 @@ struct Configuration
 
 struct Simulation
 {
-	double avg_err_vgs, avg_err_id, avg_err_vds;
+	double avg_err_VGS, avg_err_id, avg_err_vds;
 	Configuration config;
 	bool simulated;
 	void add_simulation(const Simulation&);
 private:
-	vector<double> avg_err_vgs_v, avg_err_id_v, avg_err_vds_v;
+	vector<double> avg_err_VGS_v, avg_err_id_v, avg_err_vds_v;
 };
 
 struct Dynamic_stats
 {
 	bool valid; // if false, something weird happened while compiling/simulating
 
-	double err_vgs_L, err_id_L, err_vds_L;
-	double err_vgs_H, err_id_H,err_vds_H;
+	double err_VGS_L, err_id_L, err_vds_L;
+	double err_VGS_H, err_id_H,err_vds_H;
 
 };
 // ---------------------------------------------------------------------------
 typedef struct
 {
-	double avg_err_vgs;
+	double avg_err_VGS;
 	double avg_err_vds;
 	double avg_err_id;
 
@@ -222,21 +220,20 @@ struct Exploration_stats
 // simple cache to store already simulated configurations
 class HashGA : public Hash<Simulation> // mau
 {
-	assert(false);
 public:
 	HashGA(int _size) : Hash<Simulation>(_size) {}
 
 	virtual bool equal(Simulation &t1, Simulation &t2) {
-		return (t1.config.L1D_block == t2.config.L1D_block &&
-				// TODO M9FIX
-				t1.config.memvr_profiled == t2.config.memvr_profiled);	//db
+	    // TODO M9FIX
+	    assert(false);
+		return (false);
 	}
 
 	virtual unsigned int T2Index(Simulation& t) {
-		return ( (t.config.L1D_block +
-				  // TODO M9FIX
-				  t.config.do_modulo_scheduling +		//db
-				  t.config.memvr_profiled ) % vhash.size() ); //db
+		// TODO M9FIX
+		assert(false);
+		return false;
+	//	( (t.config.L1D_block + t.config.do_modulo_scheduling +		//db t.config.memvr_profiled ) % vhash.size() ); //db
 	}
 };
 

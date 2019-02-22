@@ -4,7 +4,6 @@
 #include <vector>
 #include "common.h"
 #include "model_inverter.h"
-#include "mem_hierarchy.h"
 #include "RuleList.h"
 #include "FunctionApprox.h"
 
@@ -24,11 +23,11 @@ public:
     bool StartUp(int MaxNumberOfRules, double threshold, int _min, int _max);
 
     bool Learn(double* InputValues, double* OutputValues);
-    bool Learn(Configuration conf,Simulation sim,ModelInverter& p,Mem_hierarchy& mem);
+    bool Learn(Configuration conf, Simulation sim, ModelInverter &p);
     bool Learn(const Configuration& conf,const Dynamic_stats& dyn);
     bool GenerateInputFuzzySets(int Dimensionality, int* InputFuzzySetsNumberVector, double *InMinimumValuesVector, double *InMaximumValuesVector);
     bool EstimateG(double* InputValues,double* OutputVector);
-    Simulation Estimate1(Configuration conf,ModelInverter& p,Mem_hierarchy& mem);
+    Simulation Estimate1(Configuration conf, ModelInverter &p);
     Dynamic_stats Estimate2(Configuration conf);
     bool Reliable();
     int GetSystem();

@@ -37,8 +37,8 @@ CFuzzyFunctionApproximation::CFuzzyFunctionApproximation() {
 
 	data = asctime(localtime(&t));
 
-	sprintf(pathx,"%s/trimaran-workspace/epic-explorer/fuzzy_log.txt",stri);
-	sprintf(pathy,"%s/trimaran-workspace/epic-explorer/fuzzy_error.txt",stri);
+	sprintf(pathx,"%s/matlab-workspace/M9-explorer/fuzzy_log.txt",stri);
+	sprintf(pathy,"%s/matlab-workspace/M9-explorer/fuzzy_error.txt",stri);
 
 	fuzzy_log = fopen(pathx,"a");
 	fuzzy_error = fopen(pathy,"a");

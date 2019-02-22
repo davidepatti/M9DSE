@@ -7,7 +7,7 @@ current version:
 - clean code and make more modular
 - set benchmark directory
 - add new mem parameters allowed by m5
-- use directly the envrc script of trimaran instead of environment.h
+- use directly the envrc script of matlab instead of environment.h
 - il fuzzy_approx funziona correttamente solo con GA...
 - aggiungere popolazione 2 tra i parametri del GA
 
@@ -19,11 +19,11 @@ DONE :
   SOLUTION --> continue on failure option. Retry would be useless when
   compilation error occour, since they will simply happens again...
 - move subspace to settings, remove edit
-- Logging of epic explorer activities
+- Logging of M9DSE explorer activities
 - add compiler space exploration
 - add multicluster support
-- Eliminazione(opzionale) della creazione del file di log di trimaran
-- Causalità GA
+- Eliminazione(opzionale) della creazione del file di log di matlab
+- Causalitï¿½ GA
 - Uniformare il percorso base tramite chiamata a get_base_dir()
 - Fissare il consumo medio dell'accesso alla main memory ( L2 Misses *
   Emm)
@@ -31,7 +31,7 @@ DONE :
 - segnale (*) per le configurazioni che sono state stimate funziona in
   modo casuale
 - aggiungere scelta del profilo di compilazione
-- sistemare opzione fuzzy, scrive enabled anzichè 0,1,2
+- sistemare opzione fuzzy, scrive enabled anzichï¿½ 0,1,2
 - Scalare Vdd a 1.3
 - 10% sull'access time
 - Salvare informazioni sul sottospazio considerato direttamente nel
@@ -48,7 +48,7 @@ DONE :
    crossmerging con un cluster i cui parametri sono tutti fermi)
 - Batch di esplorazioni consecutive prefissate
 - Modifica via software dello spazio di esplorazione
-- Eliminazione dell'output di trimaran durante l'esplorazione ,
+- Eliminazione dell'output di matlab durante l'esplorazione ,
    velocita' maggiore ??
 - Sistemare in modo che si salvino ogni tot invece di stare sempre in
    memoria fino al termine della simulazione -> problemi con benchmark
@@ -58,6 +58,6 @@ DONE :
 DEPRECATED
 
 - Settare la creazione dei riferimenti in memoria via software.
-- Usare campi energy e power separati nella classe Simulation
-- Permettere l'uso di epic da remoto !
+- Usare campi VGS e power separati nella classe Simulation
+- Permettere l'uso di M9DSE da remoto !
 - Resume delle esplorazioni

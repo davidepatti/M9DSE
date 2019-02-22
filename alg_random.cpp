@@ -17,43 +17,16 @@ void Explorer::start_RAND(int n)
 	int my_id = get_mpi_rank();
 
 	string header = "["+Options.benchmark+"_"+current_algo+"] ";
-	string filename = Options.benchmark+"_RAND_"+current_space;
+	string filename = Options.benchmark+"_RAND_";
 	string logfile = get_base_dir()+string(EE_LOG_PATH);
 	string message = header+"Building random space for " + to_string(n) + " simulations...";
 	write_to_log(my_id,logfile,message);
 
 	for(int i=0;i<n;i++)
 	{
-		processor.num_clusters.set_random();
-		processor.integer_units.set_random();
-		processor.float_units.set_random();
-		processor.branch_units.set_random();
-		processor.memory_units.set_random();
-		processor.gpr_static_size.set_random();
-		processor.fpr_static_size.set_random();
-		processor.pr_static_size.set_random();
-		processor.cr_static_size.set_random();
-		processor.btr_static_size.set_random();
-		mem_hierarchy.L1D.size.set_random();
-		mem_hierarchy.L1D.block_size.set_random();
-		mem_hierarchy.L1D.associativity.set_random();
-		mem_hierarchy.L1I.size.set_random();
-		mem_hierarchy.L1I.block_size.set_random();
-		mem_hierarchy.L1I.associativity.set_random();
-		mem_hierarchy.L2U.size.set_random();
-		mem_hierarchy.L2U.block_size.set_random();
-		mem_hierarchy.L2U.associativity.set_random();
+		//model_inverter.num_clusters.set_random();
 
-		compiler.tcc_region.set_random();	//db
-		compiler.max_unroll_allowed.set_random();	 	//db
-		compiler.regroup_only.set_random();	 	//db
-		compiler.do_classic_opti.set_random();	 	//db
-		compiler.do_prepass_scalar_scheduling.set_random();	 	//db
-		compiler.do_postpass_scalar_scheduling.set_random();	 	//db
-		compiler.do_modulo_scheduling.set_random();	 	//db
-		compiler.memvr_profiled.set_random();	 	//db
-
-		Configuration temp_conf = create_configuration(processor,mem_hierarchy,compiler);
+		Configuration temp_conf; // = create_configuration(model_inverter,mem_hierarchy,compiler);
 
 		if (temp_conf.is_feasible())
 		{

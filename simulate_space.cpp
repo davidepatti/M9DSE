@@ -35,7 +35,7 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 		cout << "\n -------> M9DSE   [ simulation n." << i+1 << " / " << space.size() << " ]";
 		cout << endl;
 
-		this.model_inverter.set_config(space[i]);
+		this->model_inverter.set_config(space[i]);
 		current_sim.config = space[i];
 
 		prepare_explorer(Options.benchmark,space[i]); //DDD
@@ -49,35 +49,17 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 
 		}
 
-			dyn_stats = anInterface->get_dynamic_stats(mem_hierarchy_dir);
+			dyn_stats = anInterface->get_dynamic_stats();
 
-			estimate = estimator.get_estimate(dyn_stats,mem_hierarchy,processor);
+			estimate = estimator.get_estimate(dyn_stats);
 			current_sim.avg_err_id = estimate.avg_err_id;
-			current_sim.avg_err_vds = estimate.avg_err_vgs;
-			current_sim.clock_freq = estimate.clock_freq;
+			current_sim.avg_err_vds = estimate.avg_err_VGS;
 			current_sim.simulated = true;//do_simulation;
 
-			if (Options.objective_vgs) current_sim.avg_err_vgs = estimate.avg_err_vds;
-			else if (Options.objective_power) current_sim.avg_err_vgs = estimate.total_average_power;
+			if (Options.objective_VGS) current_sim.avg_err_VGS = estimate.avg_err_vds;
 
 			if (Options.approx_settings.enabled>0)
-				function_approx->Learn(space[i],current_sim,processor,mem_hierarchy);
-
-			if (!Options.save_restore)
-			{
-				string cmd = "rm -rf ";
-				cmd += exe_dir;
-				cout << EE_TAG << "Cleaning " << exe_dir;
-				system(cmd.c_str());
-			}
-			else if (!Options.save_PD_TRACE)
-			{
-				string cmd = "rm -f "+exe_dir+"/"+cache_dir_name+"/PD_TRACE";
-				cout << EE_TAG << "Cleaning PD_TRACE in " << exe_dir << "/" << cache_dir_name;
-				system(cmd.c_str());
-			}
-
-
+                function_approx->Learn(space[i], current_sim, model_inverter);
 
 		}
 
@@ -86,23 +68,15 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
         {   // using pproximation instead of simulation
             assert(Options.approx_settings.enabled);
 
-            current_sim = function_approx->Estimate1(space[i],processor,mem_hierarchy);
+            current_sim = function_approx->Estimate1(space[i],model_inverter,mem_hierarchy);
             current_sim.simulated = false;
-            current_sim.avg_err_id = estimator.get_processor_area(processor);
+            current_sim.avg_err_id = estimator.get_processor_ID(model_inverter);
 
         }
         */
 
 		simulations.push_back(current_sim);
 
-		// updates the number of unique configs simulated
-		string config_str = current_sim.config.configuration_to_string();
-
-		if (unique_configs.count(config_str) == 0)
-			unique_configs[config_str] = 1;
-		else
-			unique_configs[config_str]++;
-		////////////////////////////////////////////////////
 
 
 		// -------------------------------------------------------------------
@@ -117,30 +91,27 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 					n_simulate_space_call=1;
 					n_exploration_executed++;
 				}
-				// epic_space_EXP_2.12, 12th explorated space of 2nd exploration algorithm
+				// M9_space_EXP_2.12, 12th explorated space of 2nd exploration algorithm
 				char name[40];
 				sprintf(name,"_simulatedspace_%d",n_simulate_space_call);
-				string filename = Options.benchmark+"_"+current_algo+"_"+current_space+string(name);
+				string filename = Options.benchmark+"_"+current_algo+"_"+string(name);
 				save_configurations(space,filename);
 			}
 
 			if (Options.save_estimation) // detailed and verbose estimator report
 			{
 				char temp[10];
-				sprintf(temp,"%d",i);
-				string filename= Options.benchmark+"_"+current_algo+"_"+current_space+"."+string(temp)+".est";
-				save_estimation_file(dyn_stats,estimate,processor, mem_hierarchy,compiler,filename);	//db
+				string filename= Options.benchmark+"_"+current_algo+"_"+"."+string(temp)+".est";
+				save_estimation_file(dyn_stats,estimate, filename);	//db
 			}
 
 			if (Options.save_objectives_details) //
 			{
-				string filename= Options.benchmark+"_"+current_algo+"_"+current_space+".details";
+				string filename= Options.benchmark+"_"+current_algo+"_"+".details";
 				save_objectives_details(dyn_stats,current_sim.config,filename);
 			}
 			// -------------------------------------------------------------------
 		}
-
-	} // end for loop
 
 	write_to_log(myid,logfile,"Finished simulate_loop for " + Options.benchmark + " (space size: "+to_string(space.size())+")");
 	return simulations;
@@ -150,8 +121,8 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 {
 
-	int myrank = get_mpi_rank(); // id of the current epic process
-	int mysize = get_mpi_size(); // # of epic processes running
+	int myrank = get_mpi_rank(); // id of the current M9DSE process
+	int mysize = get_mpi_size(); // # of M9DSE processes running
 
 	string logfile = get_base_dir()+string(EE_LOG_PATH);
 
@@ -268,7 +239,7 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	    current_sim.config = space2[s];
 	    current_sim.avg_err_id = comms[0];
 	    current_sim.avg_err_vds = comms[1];
-	    current_sim.avg_err_vgs = comms[2];
+	    current_sim.avg_err_VGS = comms[2];
 	    current_sim.clock_freq = comms[3]; //dovrebbe essere sempre la stessa...
 	    current_sim.simulated = true;//do_simulation;
 
@@ -277,10 +248,10 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	    /* TODO: re-enable
 	    if (Options.approx_settings.enabled>0) 
 	    {
-		processor.set_config(space2[s]);
+		model_inverter.set_config(space2[s]);
 		mem_hierarchy.set_config(space2[s]); 
 		compiler.set_config(space2[s]);	//db
-		function_approx->Learn(space2[s],current_sim,processor,mem_hierarchy);
+		function_approx->Learn(space2[s],current_sim,model_inverter,mem_hierarchy);
 	    }
 	    */
 	}
@@ -296,7 +267,6 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	// update current simulated space and benchmark
 	previous_simulations.clear();
 	append_simulations(previous_simulations,simulations);
-	previous_benchmark = Options.benchmark;
 
 	return simulations;
 }
@@ -375,7 +345,7 @@ int Explorer::simulate_space()
     for (int i=0; i<counter; i++) {
     	comms[0] = simulations[i].avg_err_id;
 	comms[1] = simulations[i].avg_err_vds;
-	comms[2] = simulations[i].avg_err_vgs;
+	comms[2] = simulations[i].avg_err_VGS;
     	comms[3] = simulations[i].clock_freq;
 	MPI_Send(comms,4,MPI_DOUBLE,0,99, MPI_COMM_WORLD);
     }

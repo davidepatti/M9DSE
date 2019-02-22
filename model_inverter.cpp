@@ -59,7 +59,7 @@ void ModelInverter::set_config(const Configuration& conf)
     L_gH_ext.set_val(conf.L_gH_ext);
     L_dL_ext.set_val(conf.L_dL_ext);
 
-    L_sL_ext.set_val(conf.L_sL_ext)
+    L_sL_ext.set_val(conf.L_sL_ext);
     L_gL_ext.set_val(conf.L_gL_ext);
 
     L_Hwire.set_val(conf.L_Hwire);

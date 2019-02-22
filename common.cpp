@@ -3,7 +3,7 @@
 #include "common.h"
 #include <cstdlib>
 
-#ifdef EPIC_MPI
+#ifdef M9_MPI
 #include "mpi.h"
 #endif
 bool Configuration::is_feasible()
@@ -14,7 +14,7 @@ bool Configuration::is_feasible()
 
 void Configuration::invalidate()
 {
-    assert(false)
+    assert(false);
 }
 
 bool Configuration::check_difference(const Configuration& conf, Space_mask mask)
@@ -27,11 +27,8 @@ bool Configuration::check_difference(const Configuration& conf, Space_mask mask)
 string Configuration::get_header() const
 {
     char s[100];
-    sprintf(s,"%u / %u %u %u %u / %u %u %u %u %u / %u %u %u / %u %u %u / %u %u %u / %u %u %u %u %u %u %u %u",
-            num_clusters, integer_units, float_units, branch_units,memory_units,
-            gpr_static_size, fpr_static_size, pr_static_size, cr_static_size, btr_static_size,
-            L1D_size, L1D_block, L1D_assoc, L1I_size, L1I_block, L1I_assoc, L2U_size, L2U_block, L2U_assoc,
-            tcc_region, max_unroll_allowed, regroup_only, do_classic_opti, do_prepass_scalar_scheduling, do_postpass_scalar_scheduling, do_modulo_scheduling, memvr_profiled); //db
+    // TODO M9FIX
+    assert(false);
 
     return string(s);
 
@@ -58,27 +55,27 @@ string Configuration::get_mem_dir() const
 void Simulation::add_simulation(const Simulation& other)
 {
     //assert(config == other.config); // same configuration
-    if(avg_err_vgs_v.size() == 0 &&  avg_err_id_v.size() == 0 && avg_err_vds_v.size() == 0){ // single to multi-valued transform
-        avg_err_vgs_v.push_back(avg_err_vgs);
+    if(avg_err_VGS_v.size() == 0 &&  avg_err_id_v.size() == 0 && avg_err_vds_v.size() == 0){ // single to multi-valued transform
+        avg_err_VGS_v.push_back(avg_err_VGS);
         avg_err_id_v.push_back(avg_err_id);
         avg_err_vds_v.push_back(avg_err_vds);
     }
-    if(other.avg_err_vgs_v.size()>0 &&  other.avg_err_id_v.size()>0 && avg_err_vds_v.size()>0) { // multiple valued simulation
-        avg_err_vgs_v.insert(avg_err_vgs_v.end(), other.avg_err_vgs_v.begin(), other.avg_err_vgs_v.end());
+    if(other.avg_err_VGS_v.size()>0 &&  other.avg_err_id_v.size()>0 && avg_err_vds_v.size()>0) { // multiple valued simulation
+        avg_err_VGS_v.insert(avg_err_VGS_v.end(), other.avg_err_VGS_v.begin(), other.avg_err_VGS_v.end());
         avg_err_id_v.insert(avg_err_id_v.end(), other.avg_err_id_v.begin(), other.avg_err_id_v.end());
         avg_err_vds_v.insert(avg_err_vds_v.end(), other.avg_err_vds_v.begin(), other.avg_err_vds_v.end());
     } else { // single valued simulation
-        avg_err_vgs_v.push_back(other.avg_err_vgs);
+        avg_err_VGS_v.push_back(other.avg_err_VGS);
         avg_err_id_v.push_back(other.avg_err_id);
         avg_err_vds_v.push_back(other.avg_err_vds);
     }
     // update mean values
     vector<double>::iterator it;
     double sum = 0;
-    for(it = avg_err_vgs_v.begin(); it != avg_err_vgs_v.end(); it++)
+    for(it = avg_err_VGS_v.begin(); it != avg_err_VGS_v.end(); it++)
         sum += *it;
-    //cout<<"\n ENERGY: "<< avg_err_vgs <<" sum/size: "<< sum << "/" << avg_err_vgs_v.size() << endl;
-    avg_err_vgs = sum / avg_err_vgs_v.size();
+    //cout<<"\n VGS: "<< avg_err_VGS <<" sum/size: "<< sum << "/" << avg_err_VGS_v.size() << endl;
+    avg_err_VGS = sum / avg_err_VGS_v.size();
     sum = 0;
     for(it = avg_err_id_v.begin(); it != avg_err_id_v.end(); it++)
         sum += *it;
@@ -185,7 +182,7 @@ void write_to_log(int pid,const string& logfile,const string& message)
 
 int get_mpi_rank()
 {
-#ifdef EPIC_MPI
+#ifdef M9_MPI
     int myrank;
     MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
     return myrank;
@@ -196,7 +193,7 @@ int get_mpi_rank()
 
 int get_mpi_size()
 {
-#ifdef EPIC_MPI
+#ifdef M9_MPI
     int mysize;
     MPI_Comm_size(MPI_COMM_WORLD,&mysize);
     return mysize;

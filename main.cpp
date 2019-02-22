@@ -34,13 +34,13 @@ int main(int argc, char *argv[])
 	setenv(BASE_DIR, base_path_cstr, 1);
 
 	logfile = base_path + string(EE_LOG_PATH);
-	write_to_log(rank,logfile,"Starting MPI epic process with rank "+to_string(rank)+" on base path "+base_path);
+	write_to_log(rank,logfile,"Starting MPI M9DSE process with rank "+to_string(rank)+" on base path "+base_path);
 
 #else
 	rank = 0;
 	string base_path = string(getenv(BASE_DIR));
 	logfile = base_path +string(EE_LOG_PATH);
-	write_to_log(rank,logfile,"Starting epic process on base path "+base_path);
+	write_to_log(rank,logfile,"Starting M9DSE process on base path "+base_path);
 #endif
 
 	UserInterface *ui;
@@ -50,6 +50,6 @@ int main(int argc, char *argv[])
 #ifdef M9DSE_MPI
 	MPI_Finalize();
 #endif
-	write_to_log(rank,logfile,"Terminating epic process");
+	write_to_log(rank,logfile,"Terminating M9DSE process");
 	return EXIT_SUCCESS;
 }

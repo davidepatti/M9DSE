@@ -23,7 +23,7 @@ public:
 private:
 	struct UserSettings user_settings;
 
-	MatlabInterface * trimaran_interface;
+	MatlabInterface * matlab_interface;
 	Explorer * my_explorer;
 
 	int show_menu();
@@ -37,14 +37,13 @@ private:
 	void set_subspace_wrapper();
 
 	void start_exploration_message();
-	void edit_exploration_space();
+
 	void reload_system_config();
-	void compile_hmdes_file();
-	void compile_benchmark();
+
 	void execute_benchmark();
 	void view_statistics();
 	void compute_cost();
-	void choose_benchmark();
+
 	void info();
 	void show_system_config();
 	void schedule_explorations();

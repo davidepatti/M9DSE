@@ -4,7 +4,6 @@
 #include <vector>
 #include "common.h"
 #include "model_inverter.h"
-#include "mem_hierarchy.h"
 
 #define ERR_MEMORY 20
 
@@ -16,9 +15,9 @@ public:
 
   virtual bool Init(double _threshold, int min, int max, int nouts) = 0;
   virtual bool StartUp(int MaxNumberOf_, double threshold, int _min, int _max) = 0;
-  virtual bool Learn(Configuration conf,Simulation sim,ModelInverter& p,Mem_hierarchy& mem) = 0;
+  virtual bool Learn(Configuration conf, Simulation sim, ModelInverter &p) = 0;
   virtual bool Learn(const Configuration& conf,const Dynamic_stats& dyn) = 0;
-  virtual Simulation Estimate1(Configuration conf,ModelInverter& p,Mem_hierarchy& mem) = 0;
+  virtual Simulation Estimate1(Configuration conf, ModelInverter &p) = 0;
   virtual Dynamic_stats Estimate2(Configuration conf) = 0;
   virtual bool Reliable() = 0;
   virtual int GetSystem() = 0;

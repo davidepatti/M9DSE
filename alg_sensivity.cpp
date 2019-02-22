@@ -13,7 +13,7 @@ void Explorer::start_SAP()
     stats.space_size = get_space_size();
     stats.start_time = time(NULL);
 
-    string file_name = Options.benchmark+"_SAP_"+current_space;
+    string file_name = Options.benchmark+"_SAP_";
     vector<double> sens;
     vector<int> sorted_index;
 
@@ -37,14 +37,14 @@ void Explorer::start_SAP()
 
         vector<Simulation> sims = simulate_space(space);
 
-        double temp = get_sensivity_energydelay(sims);
+        double temp = get_sensivity_VGSVDS(sims);
 
         sens.push_back(temp);
     }
 
-    string path = get_base_dir()+"/trimaran-workspace/epic-explorer/";
+    string path = get_base_dir()+"/matlab-workspace/M9-explorer/";
     string name;
-    name = path + name + Options.benchmark + "_SAP_"+current_space+"_sensitivity.stat";
+    name = path + name + Options.benchmark + "_SAP__sensitivity.stat";
     FILE * fp = fopen(name.c_str(),"w");
 
     fprintf(fp,"\n%.14f        %% L1D_size",sens[0]);
@@ -98,7 +98,7 @@ void Explorer::start_SAP()
         vector<Configuration> space = build_space(parameter_masks[index],base_conf);
 
         vector<Simulation> sims = simulate_space(space);
-        vector<Simulation> ordered_sims = sort_by_vgsvds_product(sims);
+        vector<Simulation> ordered_sims = sort_by_VGSvds_product(sims);
 
         // base_conf must be updated, considering the optimal value
         // of the the last parameter explored
@@ -123,83 +123,6 @@ void Explorer::start_SAP()
 
 //**************************************************************
 
-void Explorer::start_SAPMOD()
-{
-    current_algo = "SAPMOD";
-    Exploration_stats stats;
-    reset_sim_counter();
-    stats.space_size = get_space_size();
-    stats.start_time = time(NULL);
-
-    vector<Simulation> max_sens_sims;
-
-    int max_sens_index;
-    double max_sens;
-    Configuration base_conf = create_configuration();
-
-    Space_mask empty_mask = get_space_mask(UNSET_ALL);
-    Space_mask temp_mask;
-
-    vector<Space_mask> parameter_masks;
-
-    // for each parameter is created a mask with only one value set to
-    // true. These masks will allow to explore all values of each
-    // parameter without changing the other
-    for (int m=0;m<N_PARAMS;m++)
-    {
-        vector<bool> boolean_mask(N_PARAMS,false);
-        boolean_mask[m] = true;
-        temp_mask = create_space_mask(boolean_mask);
-        parameter_masks.push_back(temp_mask);
-    }
-
-    string path = get_base_dir()+"/trimaran-workspace/epic-explorer/";
-    string file_name = Options.benchmark+"_SAP_"+current_space;
-    char file[50];
-    double sensitivity;
-
-    while (parameter_masks.size()>0)
-    {
-        max_sens = 0;
-
-        for (unsigned int i = 0;i<parameter_masks.size();i++)
-        {
-            vector<Configuration> space= build_space(parameter_masks[i],base_conf);
-            vector<Simulation> sims = simulate_space(space);
-
-            sensitivity = get_sensivity_energydelay(sims);
-
-            if ( sensitivity>max_sens )
-            {
-                max_sens = sensitivity;
-                max_sens_sims.clear();
-                append_simulations(max_sens_sims,sims);
-                max_sens_index = i;
-            }
-        }
-        // max_sens_index is the index of parameter_mask corresponding
-        // to the parameter which has the greatest influence on
-        // objective function avg_err_vgs-delay product
-
-        // the first is the min product
-        vector<Simulation> ordered_sims = sort_by_vgsvds_product(max_sens_sims);
-
-        sprintf(file,"/SAPMOD_%d.exp",parameter_masks.size());
-        save_simulations(ordered_sims,path+file);
-
-        // change base_conf assigning most sensitive parameter to its
-        // optimal value, the one that minimizes avg_err_vgs*delay
-        base_conf = ordered_sims[0].config;
-
-        //we must remove the mask corresponding the parameter with max
-        //sentivity value, because it will be no longer examined.
-        parameter_masks.erase(parameter_masks.begin()+max_sens_index);
-    }
-    // last base_conf should be the optimal configuration
-    stats.end_time = time(NULL);
-    stats.n_sim = get_sim_counter();
-    save_stats(stats,file_name+".stat");
-}
 // ********************************************************************
 //   Pareto-based sensivity analysis
 // ********************************************************************
@@ -257,8 +180,8 @@ void Explorer::start_PBSA()
         cout << EE_TAG << "sensivity " << p << ": " << sens[p];
     }
 
-    string name = get_base_dir()+"/trimaran-workspace/epic-explorer/";
-    name+= Options.benchmark+"_PBSA_"+current_space+"_sensitivity.stat";
+    string name = get_base_dir()+"/matlab-workspace/M9-explorer/";
+    name+= Options.benchmark+"_PBSA_sensitivity.stat";
 
     FILE * fp = fopen(name.c_str(),"w");
 
@@ -322,7 +245,7 @@ void Explorer::start_PBSA()
         // we must combine two configuration spaces:
 
         // a space where only one parameter varies on its range
-        vector<Configuration> param_space = build_space(parameter_masks[index],NO_L2_CHECK);
+        vector<Configuration> param_space = build_space(parameter_masks[index]);
 
         // ...and the space of pareto set
         vector<Configuration> pareto_space = extract_space(pareto_set);
@@ -344,11 +267,11 @@ void Explorer::start_PBSA()
 
         char temp[10];
         sprintf(temp,"%d_",i);
-        string file_name = Options.benchmark+"_PBSA_stage"+string(temp)+current_space;
+        string file_name = Options.benchmark+"_PBSA_stage"+string(temp);
         save_simulations(pareto_set,file_name+".exp");
     }
 
-    string file_name = Options.benchmark+"_PBSA_"+current_space;
+    string file_name = Options.benchmark+"_PBSA";
     save_simulations(pareto_set,file_name+".pareto.exp");
 
     stats.end_time = time(NULL);
@@ -360,14 +283,14 @@ void Explorer::start_PBSA()
 // ********************************************************************
 double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const vector<Simulation>& all_sims)
 {
-    vector<Simulation> energy_sorted = sort_by_vgs(all_sims);
+    vector<Simulation> VGS_sorted = sort_by_VGS(all_sims);
     vector<Simulation> exec_time_sorted = sort_by_vds(all_sims);
-    vector<Simulation> area_sorted = sort_by_area(all_sims);
+    vector<Simulation> ID_sorted = sort_by_ID(all_sims);
 
 
-    double max_energy = energy_sorted[energy_sorted.size()-1].avg_err_vgs;
+    double max_VGS = VGS_sorted[VGS_sorted.size()-1].avg_err_VGS;
     double max_exec_time = exec_time_sorted[exec_time_sorted.size()-1].avg_err_vds;
-    double max_area = area_sorted[area_sorted.size()-1].avg_err_id;
+    double max_ID = ID_sorted[ID_sorted.size()-1].avg_err_id;
 
     // copy simulations as normalized_sims, then each element of
     // normalized_sims will be overwritten with its normalized value
@@ -376,9 +299,9 @@ double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const 
 
     for (unsigned i=0;i<normalized_sims.size();i++)
     {
-        normalized_sims[i].avg_err_vgs = normalized_sims[i].avg_err_vgs/max_energy;
+        normalized_sims[i].avg_err_VGS = normalized_sims[i].avg_err_VGS/max_VGS;
         normalized_sims[i].avg_err_vds = normalized_sims[i].avg_err_vds/max_exec_time;
-        normalized_sims[i].avg_err_id = normalized_sims[i].avg_err_id/max_area;
+        normalized_sims[i].avg_err_id = normalized_sims[i].avg_err_id/max_ID;
     }
 
     double current_distance;
@@ -398,12 +321,12 @@ double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const 
     return max_distance;
 }
 //**************************************************************
-double Explorer::get_sensivity_energydelay(const vector<Simulation>& sims)
+double Explorer::get_sensivity_VGSVDS(const vector<Simulation>& sims)
 {
-    vector<Simulation> temp = sort_by_vgsvds_product(sims);
+    vector<Simulation> temp = sort_by_VGSvds_product(sims);
 
-    double min_product = (temp[0].avg_err_vgs)*(temp[0].avg_err_vds);
-    double max_product = (temp[temp.size()-1].avg_err_vgs)*(temp[temp.size()-1].avg_err_vds);
+    double min_product = (temp[0].avg_err_VGS)*(temp[0].avg_err_vds);
+    double max_product = (temp[temp.size()-1].avg_err_VGS)*(temp[temp.size()-1].avg_err_vds);
 
     return max_product-min_product;
 }

@@ -1,7 +1,7 @@
 Installation script assumes that source code is placed somewhere (e.g.
-in the user's home) and that the directory name is 'epic'.
+in the user's home) and that the directory name is 'M9'.
 So, if you want to use the svn code you should create a symbolic link
-named 'epic' that points to the svn code.
+named 'M9' that points to the svn code.
 For example:
-ln -s ~/epic-explorer/trunk epic
+ln -s ~/M9-explorer/trunk M9
 

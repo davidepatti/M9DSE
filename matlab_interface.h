@@ -30,7 +30,7 @@ public:
 	void save_model_config(const ModelInverter &, const string &path) const;
 	void load_model_config(ModelInverter *p, const string &filename) const;
 
-	Dynamic_stats get_dynamic_stats(const string& filename);
+	Dynamic_stats get_dynamic_stats();
 
 private:
 	string base_path;

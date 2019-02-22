@@ -6,7 +6,7 @@ CRuleList::CRuleList(int maxrules, int indim, int outdim)
 	InDim = indim;
 	OutDim = outdim;
 	RuleList = new Rule[maxrules];
-	if (RuleList == NULL) ; //??
+//	if (RuleList == NULL) ; //??
 	counter = 0;
 	pos = 0;
 }

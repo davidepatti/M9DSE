@@ -18,11 +18,9 @@ add_executable(M9DSE
         spea2/src/utility.h
         spea2/src/variator.cpp
         spea2/src/variator.h
-        alg_dep.cpp
         alg_genetic.cpp
         alg_random.cpp
         alg_sensivity.cpp
-        cacti_area_interface.h
         common.cpp
         common.h
         environment.h
@@ -46,7 +44,6 @@ add_executable(M9DSE
         RuleList.cpp
         RuleList.h
         simulate_space.cpp
-        time.c
         matlab_interface.cpp
         matlab_interface.h
         user_interface.cpp

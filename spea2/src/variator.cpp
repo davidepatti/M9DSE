@@ -64,21 +64,12 @@ void variator::variate(bool adjustedOperators){
 		individual tmp2 = global_pop->at(id2).child();
 		// father and mother crossover
 		if(drand(1) < crossover_p)
-			if (adjustedOperators)
-				tmp1.adjusted_crossover(tmp2);
-			else
 				tmp1.crossover(tmp2);
 		// brother mutation
 		if(drand(1) < mutation_p)
-			if (adjustedOperators)
-				tmp1.adjusted_mutation(mutation_p);
-			else
 				tmp1.mutation(mutation_p);
 		// sister mutation
 		if(drand(1) < mutation_p)
-			if (adjustedOperators)
-				tmp2.adjusted_mutation(mutation_p);
-			else
 				tmp2.mutation(mutation_p);
 		//global_pop->push_back(tmp1);
 		//global_pop->push_back(tmp2);

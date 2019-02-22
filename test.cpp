@@ -6,11 +6,11 @@
 
 void test()
 {
-    // assuming trimaran source and epic unpacked in $HOME dir
+    // assuming matlab source and M9DSE unpacked in $HOME dir
     string base_dir = string(getenv("HOME"));
 
-    //get a trimaran interface
-    Trimaran_interface* interface = new Trimaran_interface(base_dir);
+    //get a matlab interface
+    matlab_interface* interface = new matlab_interface(base_dir);
 
     // create a new explorer object connected to the interface
     Explorer* my_explorer = new Explorer(interface);
