@@ -21,7 +21,7 @@ public:
 	void set_to_default();
 	void set_config(const Configuration&);
 
-	// Induttanze parassite di bonding interne al package
+	// Induttanze parassite di bonding interne al package Parameter L_d_int;
 	Parameter L_d_int;
 	Parameter L_s_int;
 	Parameter L_g_int;
@@ -44,6 +44,26 @@ public:
 	Parameter L_Hwire;
 	Parameter L_Lwire;
 
+	/*
+	L_d_int
+	L_s_int
+	L_g_int
+
+	L_d_pin
+	L_s_pin
+	L_g_pin
+
+	L_dH_ext
+	L_sH_ext
+	L_gH_ext
+	L_dL_ext
+	L_sL_ext
+	L_gL_ext
+
+
+	L_Hwire
+	L_Lwire
+	 */
 };
 
 #endif

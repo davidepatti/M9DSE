@@ -13,7 +13,7 @@ void Explorer::start_SAP()
     stats.space_size = get_space_size();
     stats.start_time = time(NULL);
 
-    string file_name = Options.benchmark+"_SAP_";
+    string file_name = "SAP_";
     vector<double> sens;
     vector<int> sorted_index;
 
@@ -31,8 +31,6 @@ void Explorer::start_SAP()
         Space_mask temp_mask = create_space_mask(boolean_mask);
         parameter_masks.push_back(temp_mask);
 
-        // note NO_L2_CHECK option, cache size parameters should
-        // be considered in all their range while testing sensivity
         vector<Configuration> space = build_space(temp_mask,base_conf);
 
         vector<Simulation> sims = simulate_space(space);
@@ -44,28 +42,23 @@ void Explorer::start_SAP()
 
     string path = get_base_dir()+"/matlab-workspace/M9-explorer/";
     string name;
-    name = path + name + Options.benchmark + "_SAP__sensitivity.stat";
+    name = path + name + "_SAP__sensitivity.stat";
     FILE * fp = fopen(name.c_str(),"w");
 
-    fprintf(fp,"\n%.14f        %% L1D_size",sens[0]);
-    fprintf(fp,"\n%.14f        %% L1D_block",sens[1]);
-    fprintf(fp,"\n%.14f        %% L1D_assoc",sens[2]);
-    fprintf(fp,"\n%.14f        %% L1I_size",sens[3]);
-    fprintf(fp,"\n%.14f        %% L1I_block",sens[4]);
-    fprintf(fp,"\n%.14f        %% L1I_assoc",sens[5]);
-    fprintf(fp,"\n%.14f        %% L2U_size",sens[6]);
-    fprintf(fp,"\n%.14f        %% L2U_block",sens[7]);
-    fprintf(fp,"\n%.14f        %% L2U_assoc",sens[8]);
-    fprintf(fp,"\n%.14f        %% L_s_int",sens[9]);
-    fprintf(fp,"\n%.14f        %% L_g_int",sens[10]);
-    fprintf(fp,"\n%.14f        %% L_s_pin",sens[11]);
-    fprintf(fp,"\n%.14f        %% L_d_pin",sens[12]);
-    fprintf(fp,"\n%.14f        %% L_g_pin",sens[13]);
-    fprintf(fp,"\n%.14f        %% L_dH_ext",sens[14]);
-    fprintf(fp,"\n%.14f        %% L_sH_ext",sens[15]);
-    fprintf(fp,"\n%.14f        %% L_gH_ext",sens[16]);
-    fprintf(fp,"\n%.14f        %% L_dL_ext",sens[17]);
-    fprintf(fp,"\n%.14f        %% L_d_int",sens[18]);
+    fprintf(fp,"\n%.14f        %% L_d_int",sens[0]);
+    fprintf(fp,"\n%.14f        %% L_s_int",sens[1]);
+    fprintf(fp,"\n%.14f        %% L_g_int",sens[2]);
+    fprintf(fp,"\n%.14f        %% L_d_pin",sens[3]);
+    fprintf(fp,"\n%.14f        %% L_s_pin",sens[4]);
+    fprintf(fp,"\n%.14f        %% L_g_pin",sens[5]);
+    fprintf(fp,"\n%.14f        %% L_dH_ext",sens[6]);
+    fprintf(fp,"\n%.14f        %% L_sH_ext",sens[7]);
+    fprintf(fp,"\n%.14f        %% L_gH_ext",sens[8]);
+    fprintf(fp,"\n%.14f        %% L_dL_ext",sens[9]);
+    fprintf(fp,"\n%.14f        %% L_sL_ext",sens[10]);
+    fprintf(fp,"\n%.14f        %% L_gL_ext",sens[11]);
+    fprintf(fp,"\n%.14f        %% L_Hwire",sens[12]);
+    fprintf(fp,"\n%.14f        %% L_Lwire",sens[13]);
 
     fclose(fp);
 
@@ -98,7 +91,7 @@ void Explorer::start_SAP()
         vector<Configuration> space = build_space(parameter_masks[index],base_conf);
 
         vector<Simulation> sims = simulate_space(space);
-        vector<Simulation> ordered_sims = sort_by_VGSvds_product(sims);
+        vector<Simulation> ordered_sims = sort_by_VGSVDS_product(sims);
 
         // base_conf must be updated, considering the optimal value
         // of the the last parameter explored
@@ -157,9 +150,6 @@ void Explorer::start_PBSA()
         Space_mask temp_mask = create_space_mask(boolean_mask);
         parameter_masks.push_back(temp_mask);
 
-        // note NO_L2_CHECK option, cache size parameters should
-        // be considered in all their range while testing sensivity
-
         vector<Configuration> space = build_space(temp_mask);
         vector<Simulation> sims = simulate_space(space);
 
@@ -177,33 +167,28 @@ void Explorer::start_PBSA()
     {
         double temp = get_sensivity_PBSA(parameters_sim_collection[p],all_parameter_sims);
         sens.push_back(temp);
-        cout << EE_TAG << "sensivity " << p << ": " << sens[p];
+        cout << M9DSE_TAG << "sensivity " << p << ": " << sens[p];
     }
 
     string name = get_base_dir()+"/matlab-workspace/M9-explorer/";
-    name+= Options.benchmark+"_PBSA_sensitivity.stat";
+    name+= "PBSA_sensitivity.stat";
 
     FILE * fp = fopen(name.c_str(),"w");
 
-    fprintf(fp,"\n%.14f        %% L1D_size",sens[0]);
-    fprintf(fp,"\n%.14f        %% L1D_block",sens[1]);
-    fprintf(fp,"\n%.14f        %% L1D_assoc",sens[2]);
-    fprintf(fp,"\n%.14f        %% L1I_size",sens[3]);
-    fprintf(fp,"\n%.14f        %% L1I_block",sens[4]);
-    fprintf(fp,"\n%.14f        %% L1I_assoc",sens[5]);
-    fprintf(fp,"\n%.14f        %% L2U_size",sens[6]);
-    fprintf(fp,"\n%.14f        %% L2U_block",sens[7]);
-    fprintf(fp,"\n%.14f        %% L2U_assoc",sens[8]);
-    fprintf(fp,"\n%.14f        %% L_s_int",sens[9]);
-    fprintf(fp,"\n%.14f        %% L_g_int",sens[10]);
-    fprintf(fp,"\n%.14f        %% L_s_pin",sens[11]);
-    fprintf(fp,"\n%.14f        %% L_d_pin",sens[12]);
-    fprintf(fp,"\n%.14f        %% L_g_pin",sens[13]);
-    fprintf(fp,"\n%.14f        %% L_dH_ext",sens[14]);
-    fprintf(fp,"\n%.14f        %% L_sH_ext",sens[15]);
-    fprintf(fp,"\n%.14f        %% L_gH_ext",sens[16]);
-    fprintf(fp,"\n%.14f        %% L_dL_ext",sens[17]);
-    fprintf(fp,"\n%.14f        %% L_d_int",sens[18]);
+    fprintf(fp,"\n%.14f        %% L_d_int",sens[0]);
+    fprintf(fp,"\n%.14f        %% L_s_int",sens[1]);
+    fprintf(fp,"\n%.14f        %% L_g_int",sens[2]);
+    fprintf(fp,"\n%.14f        %% L_d_pin",sens[3]);
+    fprintf(fp,"\n%.14f        %% L_s_pin",sens[4]);
+    fprintf(fp,"\n%.14f        %% L_g_pin",sens[5]);
+    fprintf(fp,"\n%.14f        %% L_dH_ext",sens[6]);
+    fprintf(fp,"\n%.14f        %% L_sH_ext",sens[7]);
+    fprintf(fp,"\n%.14f        %% L_gH_ext",sens[8]);
+    fprintf(fp,"\n%.14f        %% L_dL_ext",sens[9]);
+    fprintf(fp,"\n%.14f        %% L_sL_ext",sens[10]);
+    fprintf(fp,"\n%.14f        %% L_gL_ext",sens[11]);
+    fprintf(fp,"\n%.14f        %% L_Hwire",sens[12]);
+    fprintf(fp,"\n%.14f        %% L_Lwire",sens[13]);
 
     fclose(fp);
 
@@ -267,11 +252,11 @@ void Explorer::start_PBSA()
 
         char temp[10];
         sprintf(temp,"%d_",i);
-        string file_name = Options.benchmark+"_PBSA_stage"+string(temp);
+        string file_name = "PBSA_stage"+string(temp);
         save_simulations(pareto_set,file_name+".exp");
     }
 
-    string file_name = Options.benchmark+"_PBSA";
+    string file_name = "PBSA";
     save_simulations(pareto_set,file_name+".pareto.exp");
 
     stats.end_time = time(NULL);
@@ -284,13 +269,13 @@ void Explorer::start_PBSA()
 double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const vector<Simulation>& all_sims)
 {
     vector<Simulation> VGS_sorted = sort_by_VGS(all_sims);
-    vector<Simulation> exec_time_sorted = sort_by_vds(all_sims);
+    vector<Simulation> VDS_sorted = sort_by_VDS(all_sims);
     vector<Simulation> ID_sorted = sort_by_ID(all_sims);
 
 
     double max_VGS = VGS_sorted[VGS_sorted.size()-1].avg_err_VGS;
-    double max_exec_time = exec_time_sorted[exec_time_sorted.size()-1].avg_err_vds;
-    double max_ID = ID_sorted[ID_sorted.size()-1].avg_err_id;
+    double max_VDS = VDS_sorted[VDS_sorted.size()-1].avg_err_VDS;
+    double max_ID = ID_sorted[ID_sorted.size()-1].avg_err_ID;
 
     // copy simulations as normalized_sims, then each element of
     // normalized_sims will be overwritten with its normalized value
@@ -300,8 +285,8 @@ double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const 
     for (unsigned i=0;i<normalized_sims.size();i++)
     {
         normalized_sims[i].avg_err_VGS = normalized_sims[i].avg_err_VGS/max_VGS;
-        normalized_sims[i].avg_err_vds = normalized_sims[i].avg_err_vds/max_exec_time;
-        normalized_sims[i].avg_err_id = normalized_sims[i].avg_err_id/max_ID;
+        normalized_sims[i].avg_err_VDS = normalized_sims[i].avg_err_VDS/max_VDS;
+        normalized_sims[i].avg_err_ID = normalized_sims[i].avg_err_ID/max_ID;
     }
 
     double current_distance;
@@ -323,10 +308,10 @@ double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const 
 //**************************************************************
 double Explorer::get_sensivity_VGSVDS(const vector<Simulation>& sims)
 {
-    vector<Simulation> temp = sort_by_VGSvds_product(sims);
+    vector<Simulation> temp = sort_by_VGSVDS_product(sims);
 
-    double min_product = (temp[0].avg_err_VGS)*(temp[0].avg_err_vds);
-    double max_product = (temp[temp.size()-1].avg_err_VGS)*(temp[temp.size()-1].avg_err_vds);
+    double min_product = (temp[0].avg_err_VGS)*(temp[0].avg_err_VDS);
+    double max_product = (temp[temp.size()-1].avg_err_VGS)*(temp[temp.size()-1].avg_err_VDS);
 
     return max_product-min_product;
 }

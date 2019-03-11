@@ -11,54 +11,20 @@
 #include <string>
 #include <sstream>
 #include "hash.h"
-
-// IMPORTANT:
-// you should set this to "DIR" if you install matlab and
-// matlab-workspace directories to the content of environment
-// variable $DIR
-// DAV #define BASE_DIR "PWD"
-#define BASE_DIR "HOME"
-
-#define DEFAULT_BENCH "fir_int"
-#define MAIN_HMDES2 "hpl_pd_elcor_std.hmdes2"
-#define EXPLORER_HMDES2 "explorer.hmdes2"
-#define COMPILER_PARAM "compiler_param" //db
-#define EE_TAG "\n    >> EE: "
-#define EE_LOG_PATH "/matlab-workspace/M9-explorer/M9.log"
-#define N_PARAMS 27
-
 // ---------------------------------------------------------------------------
 
+#define M9DSE_TAG "\n    >> M9DSE: "
 #ifndef NULL
 #define NULL 0
 #endif
 #define TRIANGLE_SET 1
 #define GAUSSIAN_SET 2
 
-#define BIG_CYCLES      1e30
-#define BIG_VGS      1e30
-#define BIG_ID        1e30
+#define N_PARAMS 14
 
-// added by andrea.araldo@gmail.com
-// TODO: non so se questo sia il posto giusto per mettere questo
-enum EParameterType
-{
-	ke_gpr_static_size, ke_fpr_static_size, ke_pr_static_size,
-	ke_cr_static_size, ke_btr_static_size,
-
-	ke_num_clusters, ke_integer_units, ke_float_units, ke_branch_units,
-	ke_memory_units,
-
-	ke_L1D_size, ke_L1D_block_size, ke_L1D_associativity,
-	ke_L1I_size, ke_L1I_block_size, ke_L1I_associativity,
-	ke_L2U_size, ke_L2U_block_size, ke_L2U_associativity,
-
-	ke_tcc_region, ke_max_unroll_allowed, ke_regroup_only,
-	ke_do_classic_opti, ke_do_prepass_scalar_scheduling,
-	ke_do_postpass_scalar_scheduling, ke_do_modulo_scheduling,
-	ke_memvr_profiled
-};
-
+#define BIG_CYCLES      1
+#define BIG_VGS      1
+#define BIG_ID        1
 
 
 using namespace std;
@@ -74,7 +40,7 @@ int atoi(const string& s);
 string get_base_dir();
 double max(const double& a,const double& b);
 string noyes(int x);
-bool file_exists(const string& filename);
+
 int get_mpi_rank();
 int get_mpi_size();
 void write_to_log(int id, const string& logfile,const string& message);
@@ -89,10 +55,9 @@ template<typename T> std::string to_string(const T& t){
 
 struct UserSettings
 {
-	string benchmark;
-	bool objective_id;
-	bool objective_vds;
-	bool objective_VGS;
+	bool objective_avg_errID;
+	bool objective_avg_errVDS;
+	bool objective_avg_errVGS;
 	bool save_spaces;
 	bool save_estimation;
 	bool save_objectives_details;
@@ -111,11 +76,21 @@ struct UserSettings
 
 struct Space_mask
 {
-	// TODO fix M9DSE
-	bool L1D_block; bool L1D_size; bool L1D_assoc;
-	bool L1I_block; bool L1I_size; bool L1I_assoc;
-	bool L2U_block; bool L2U_size; bool L2U_assoc;
 
+	bool L_d_int;
+	bool L_s_int;
+	bool L_g_int;
+	bool L_d_pin;
+	bool L_s_pin;
+	bool L_g_pin;
+	bool L_dH_ext;
+	bool L_sH_ext;
+	bool L_gH_ext;
+	bool L_dL_ext;
+	bool L_sL_ext;
+	bool L_gL_ext;
+	bool L_Hwire;
+	bool L_Lwire;
 };
 
 // ---------------------------------------------------------------------------
@@ -168,41 +143,35 @@ struct Configuration
 	double L_Lwire; // % Riferimento Q3D 10.95e-9;   % Valore modificabile
 
 	bool is_feasible(); // mau
-	void invalidate();
-	bool check_difference(const Configuration&,Space_mask);
 	string get_header() const;
 	string get_executable_dir() const;
-	string get_mem_dir() const;
-
-	string configuration_to_string() const;
-	//</added by andrea.araldo@gmail.com>
 
 };
 
 struct Simulation
 {
-	double avg_err_VGS, avg_err_id, avg_err_vds;
+	double avg_err_VGS, avg_err_ID, avg_err_VDS;
 	Configuration config;
 	bool simulated;
 	void add_simulation(const Simulation&);
 private:
-	vector<double> avg_err_VGS_v, avg_err_id_v, avg_err_vds_v;
+	vector<double> avg_err_VGS_v, avg_err_ID_v, avg_err_VDS_v;
 };
 
 struct Dynamic_stats
 {
 	bool valid; // if false, something weird happened while compiling/simulating
 
-	double err_VGS_L, err_id_L, err_vds_L;
-	double err_VGS_H, err_id_H,err_vds_H;
+	double err_VGS_L, err_ID_L, err_VDS_L;
+	double err_VGS_H, err_ID_H,err_VDS_H;
 
 };
 // ---------------------------------------------------------------------------
 typedef struct
 {
 	double avg_err_VGS;
-	double avg_err_vds;
-	double avg_err_id;
+	double avg_err_VDS;
+	double avg_err_ID;
 
 } Estimate;
 // ---------------------------------------------------------------------------
@@ -211,7 +180,6 @@ struct Exploration_stats
 	double space_size;
 	double feasible_size;
 	int n_sim;
-	int recompilations;
 	time_t start_time;
 	time_t end_time;
 };
@@ -224,16 +192,33 @@ public:
 	HashGA(int _size) : Hash<Simulation>(_size) {}
 
 	virtual bool equal(Simulation &t1, Simulation &t2) {
-	    // TODO M9FIX
-	    assert(false);
-		return (false);
+
+		return (t1.config.L_d_int== t2.config.L_d_int&&
+				t1.config.L_s_int== t2.config.L_s_int&&
+				t1.config.L_g_int== t2.config.L_g_int&&
+				t1.config.L_d_pin== t2.config.L_d_pin&&
+				t1.config.L_s_pin== t2.config.L_s_pin&&
+				t1.config.L_g_pin== t2.config.L_g_pin&&
+				t1.config.L_dH_ext== t2.config.L_dH_ext&&
+				t1.config.L_sH_ext== t2.config.L_sH_ext&&
+				t1.config.L_gH_ext== t2.config.L_gH_ext&&
+				t1.config.L_dL_ext== t2.config.L_dL_ext&&
+				t1.config.L_sL_ext== t2.config.L_sL_ext&&
+				t1.config.L_gL_ext== t2.config.L_gL_ext&&
+				t1.config.L_Hwire== t2.config.L_Hwire&&
+				t1.config.L_Lwire== t2.config.L_Lwire);
 	}
 
-	virtual unsigned int T2Index(Simulation& t) {
-		// TODO M9FIX
+
+	virtual unsigned int T2Index(Simulation& t1) {
+		double something = (t1.config.L_d_int + t1.config.L_s_int+ t1.config.L_g_int+ t1.config.L_d_pin+
+		t1.config.L_s_pin+ t1.config.L_g_pin+ t1.config.L_dH_ext + t1.config.L_sH_ext + t1.config.L_gH_ext +
+		t1.config.L_dL_ext + t1.config.L_sL_ext + t1.config.L_gL_ext + t1.config.L_Hwire + t1.config.L_Lwire);
+
 		assert(false);
-		return false;
-	//	( (t.config.L1D_block + t.config.do_modulo_scheduling +		//db t.config.memvr_profiled ) % vhash.size() ); //db
+		int some_int = something * 10e9;
+
+		return (  some_int% vhash.size() );
 	}
 };
 

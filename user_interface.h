@@ -46,7 +46,6 @@ private:
 
 	void info();
 	void show_system_config();
-	void schedule_explorations();
 
 	inline string status_string(bool b);
 	string word;

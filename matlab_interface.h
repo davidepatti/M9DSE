@@ -16,7 +16,7 @@ class MatlabInterface {
 
 public: 
     
-    MatlabInterface(const string& base_dir);
+    MatlabInterface();
     
     ~MatlabInterface();
 

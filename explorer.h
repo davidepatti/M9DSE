@@ -31,7 +31,7 @@ public:
     ModelInverter model_inverter;
     Estimator estimator;
 
-    Explorer(MatlabInterface * ti);
+    Explorer(MatlabInterface * pInterface);
     ~Explorer();
 
     // Functions to modify explorer options
@@ -89,17 +89,17 @@ public:
 
     vector<Simulation> get_pareto(const vector<Simulation>& simulations);
     vector<Simulation> get_pareto3d(const vector<Simulation>& simulations);
-    vector<Simulation> get_pareto_CyclesPower(const vector<Simulation>& simulations);
-    vector<Simulation> get_pareto_IDCycles(const vector<Simulation>& simulations);
-    vector<Simulation> get_pareto_IDPower(const vector<Simulation>& simulations);
+    vector<Simulation> get_pareto_VDSVGS(const vector<Simulation> &simulations);
+    vector<Simulation> get_pareto_IDVDS(const vector<Simulation> &simulations);
+    vector<Simulation> get_pareto_IDVGS(const vector<Simulation> &simulations);
 
     void remove_dominated_simulations(vector<Simulation>& sims);
     vector<Simulation> normalize(const vector<Simulation>& sims);
 
-    vector<Simulation> sort_by_vds(vector<Simulation> sims);
+    vector<Simulation> sort_by_VDS(vector<Simulation> sims);
     vector<Simulation> sort_by_VGS(vector<Simulation> sims);
     vector<Simulation> sort_by_ID(vector<Simulation> sims);
-    vector<Simulation> sort_by_VGSvds_product(vector<Simulation> sims);
+    vector<Simulation> sort_by_VGSVDS_product(vector<Simulation> sims);
 
     double get_sensivity_VGSVDS(const vector<Simulation>& sim);
     double get_sensivity_PBSA(const vector<Simulation>& sim,const vector<Simulation>& all_sims);
@@ -131,7 +131,7 @@ public:
 
 private:
 
-    void prepare_explorer(const string& application,const Configuration& config);
+    void prepare_explorer(const Configuration &config);
     vector<Simulation> simulate_loop(const vector<Configuration>& space);
 
 
@@ -140,7 +140,7 @@ private:
     //--------------------
     void GA_evaluate(population* pop); //G
     Configuration ind2conf(const individual& ind); //G
-    MatlabInterface  * anInterface;
+    MatlabInterface  * matlabInterface;
 
     Estimate estimate;
     Dynamic_stats dyn_stats;
@@ -156,7 +156,6 @@ private:
     map<string,int> unique_configs;
     vector<Simulation> previous_simulations;
     string current_algo;
-    string base_dir;
 };
 
 bool isDominated(Simulation sim, const vector<Simulation>& simulations);

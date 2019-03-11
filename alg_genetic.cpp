@@ -17,7 +17,7 @@
 void Explorer::start_GA(const GA_parameters& parameters)
 {
     current_algo="GA";
-    string logfile = get_base_dir()+string(EE_LOG_PATH);
+    string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
     int myrank = get_mpi_rank();
 
 
@@ -36,7 +36,7 @@ void Explorer::start_GA(const GA_parameters& parameters)
     reset_sim_counter();
 
     string file_name;
-    file_name = Options.benchmark+"_"+current_algo;
+    file_name = current_algo;
 
     write_to_log(myrank,logfile,"Starting "+file_name);
 
@@ -124,9 +124,24 @@ void Explorer::init_GA()
     // model_inverter parameters
 
     // TODO M9fix
-    //alleles.push_back((model_inverter.integer_units.get_values()));
-    //alleles.push_back((model_inverter.float_units.get_values()));
+    alleles.push_back((model_inverter.L_d_int.get_values()));
+    alleles.push_back((model_inverter.L_s_int.get_values()));
+    alleles.push_back((model_inverter.L_g_int.get_values()));
 
+    alleles.push_back((model_inverter.L_d_pin.get_values()));
+    alleles.push_back((model_inverter.L_s_pin.get_values()));
+    alleles.push_back((model_inverter.L_g_pin.get_values()));
+
+    alleles.push_back((model_inverter.L_dH_ext.get_values()));
+    alleles.push_back((model_inverter.L_sH_ext.get_values()));
+    alleles.push_back((model_inverter.L_gH_ext.get_values()));
+
+    alleles.push_back((model_inverter.L_dL_ext.get_values()));
+    alleles.push_back((model_inverter.L_sL_ext.get_values()));
+    alleles.push_back((model_inverter.L_gL_ext.get_values()));
+
+    alleles.push_back((model_inverter.L_Hwire.get_values()));
+    alleles.push_back((model_inverter.L_Lwire.get_values()));
 
     individual::setAllelesets(alleles); // set static allele sets genome for individuals
 }
@@ -138,7 +153,20 @@ Configuration Explorer::ind2conf(const individual& ind){
 
     assert(false);
     // TODO m9fix
-    //conf.integer_units = ind.phenotype(0);
+    conf.L_d_int= ind.phenotype(0);
+    conf.L_s_int= ind.phenotype(1);
+    conf.L_g_int= ind.phenotype(2);
+    conf.L_d_pin= ind.phenotype(3);
+    conf.L_s_pin= ind.phenotype(4);
+    conf.L_g_pin= ind.phenotype(5);
+    conf.L_dH_ext= ind.phenotype(6);
+    conf.L_sH_ext= ind.phenotype(7);
+    conf.L_gH_ext= ind.phenotype(8);
+    conf.L_dL_ext= ind.phenotype(9);
+    conf.L_sL_ext= ind.phenotype(10);
+    conf.L_gL_ext= ind.phenotype(11);
+    conf.L_Hwire= ind.phenotype(12);
+    conf.L_Lwire= ind.phenotype(13);
     return conf;
 }
 
@@ -152,7 +180,7 @@ void Explorer::GA_evaluate(population* pop)
     vconf.reserve(pop->size());
     indexes.reserve(pop->size());
 
-    string logfile = get_base_dir()+string(EE_LOG_PATH);
+    string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
     int myrank = get_mpi_rank();
 
     for(int index=0; index < pop->size(); index++)
@@ -163,9 +191,9 @@ void Explorer::GA_evaluate(population* pop)
 
         if(!conf.is_feasible()){
             write_to_log(myrank,logfile,"WARNING: GA configuration " + to_string(index) + " not feasible");
-            sim.avg_err_vds = BIG_CYCLES;
+            sim.avg_err_VDS = BIG_CYCLES;
             sim.avg_err_VGS = BIG_VGS;
-            sim.avg_err_id = BIG_ID;
+            sim.avg_err_ID = BIG_ID;
             vsim[index] = sim;
         }
         else {
@@ -211,18 +239,16 @@ void Explorer::GA_evaluate(population* pop)
 
     // reinsert simulation values into GA
 
-    //const int SCALE = 1; // seconds
-    const int SCALE = 1000; // milliseconds
     assert(vsim.size() == pop->size());
     //    int disp = bench * n_obj;
     for(int i=0; i<pop->size(); i++)
     {
-        (*pop)[i].objectives[0] = vsim[i].avg_err_vds * SCALE;
+        (*pop)[i].objectives[0] = vsim[i].avg_err_VDS;
 
         if( (*pop)[i].objectives_dim() > 1)
             (*pop)[i].objectives[1] = vsim[i].avg_err_VGS;
         if( (*pop)[i].objectives_dim() > 2)
-            (*pop)[i].objectives[2] = vsim[i].avg_err_id;
+            (*pop)[i].objectives[2] = vsim[i].avg_err_ID;
     }
 
 }
@@ -234,12 +260,37 @@ void Explorer::SimulateBestWorst()
     vector<pair<int,int> > minmax = getParameterRanges();
 
     Configuration cnf_best;
-    // TODO M9FIX
-    //cnf_best.integer_units = minmax[0].second;
+    cnf_best.L_d_int = minmax[0].second;
+    cnf_best.L_s_int = minmax[1].second;
+    cnf_best.L_g_int = minmax[2].second;
+    cnf_best.L_d_pin = minmax[3].second;
+    cnf_best.L_s_pin = minmax[4].second;
+    cnf_best.L_g_pin = minmax[5].second;
+    cnf_best.L_dH_ext = minmax[6].second;
+    cnf_best.L_sH_ext = minmax[7].second;
+    cnf_best.L_gH_ext = minmax[8].second;
+    cnf_best.L_dL_ext = minmax[9].second;
+    cnf_best.L_sL_ext = minmax[10].second;
+    cnf_best.L_gL_ext = minmax[11].second;
+    cnf_best.L_Hwire = minmax[12].second;
+    cnf_best.L_Lwire = minmax[13].second;
+
 
     Configuration cnf_worst;
-    // TODO M9FIX
-    //cnf_worst.integer_units = minmax[0].first;
+    cnf_worst.L_d_int = minmax[0].first;
+    cnf_worst.L_s_int = minmax[1].first;
+    cnf_worst.L_g_int = minmax[2].first;
+    cnf_worst.L_d_pin = minmax[3].first;
+    cnf_worst.L_s_pin = minmax[4].first;
+    cnf_worst.L_g_pin = minmax[5].first;
+    cnf_worst.L_dH_ext = minmax[6].first;
+    cnf_worst.L_sH_ext = minmax[7].first;
+    cnf_worst.L_gH_ext = minmax[8].first;
+    cnf_worst.L_dL_ext = minmax[9].first;
+    cnf_worst.L_sL_ext = minmax[10].first;
+    cnf_worst.L_gL_ext = minmax[11].first;
+    cnf_worst.L_Hwire = minmax[12].first;
+    cnf_worst.L_Lwire = minmax[13].first;
 
     vector<Configuration> cnf_best_worst;
 

@@ -14,19 +14,34 @@ void Explorer::start_RAND(int n)
 	reset_sim_counter();
 	Exploration_stats stats;
 
-	int my_id = get_mpi_rank();
+	int my_ID = get_mpi_rank();
 
-	string header = "["+Options.benchmark+"_"+current_algo+"] ";
-	string filename = Options.benchmark+"_RAND_";
-	string logfile = get_base_dir()+string(EE_LOG_PATH);
+	string header = "["+current_algo+"] ";
+	string filename = "RAND_";
+	string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
 	string message = header+"Building random space for " + to_string(n) + " simulations...";
-	write_to_log(my_id,logfile,message);
+	write_to_log(my_ID,logfile,message);
 
 	for(int i=0;i<n;i++)
 	{
 		//model_inverter.num_clusters.set_random();
 
-		Configuration temp_conf; // = create_configuration(model_inverter,mem_hierarchy,compiler);
+		model_inverter.L_d_int.set_random();
+		model_inverter.L_s_int.set_random();
+		model_inverter.L_g_int.set_random();
+		model_inverter.L_d_pin.set_random();
+		model_inverter.L_s_pin.set_random();
+		model_inverter.L_g_pin.set_random();
+		model_inverter.L_dH_ext.set_random();
+		model_inverter.L_sH_ext.set_random();
+		model_inverter.L_gH_ext.set_random();
+		model_inverter.L_dL_ext.set_random();
+		model_inverter.L_sL_ext.set_random();
+		model_inverter.L_gL_ext.set_random();
+		model_inverter.L_Hwire.set_random();
+		model_inverter.L_Lwire.set_random();
+
+		Configuration temp_conf = create_configuration(model_inverter);
 
 		if (temp_conf.is_feasible())
 		{
@@ -39,7 +54,7 @@ void Explorer::start_RAND(int n)
 	stats.start_time = time(NULL);
 
 	message = header+ "Valid configurations:" + to_string(valid) + " of "+to_string(n)+" requested";
-	write_to_log(my_id,logfile,message);
+	write_to_log(my_ID,logfile,message);
 
 	vector<Simulation> rand_sims = simulate_space(random_space);
 	vector<Simulation> pareto_set = get_pareto(rand_sims);
@@ -51,5 +66,5 @@ void Explorer::start_RAND(int n)
 	stats.n_sim = get_sim_counter();
 	save_stats(stats,filename+".stat");
 
-	write_to_log(my_id,logfile,"End of RANDOM simulation");
+	write_to_log(my_ID,logfile,"End of RANDOM simulation");
 }

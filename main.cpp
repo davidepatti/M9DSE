@@ -33,18 +33,19 @@ int main(int argc, char *argv[])
 	string base_path = string(base_path_cstr);
 	setenv(BASE_DIR, base_path_cstr, 1);
 
-	logfile = base_path + string(EE_LOG_PATH);
+	logfile = base_path + string(M9DSE_LOG_FILE);
 	write_to_log(rank,logfile,"Starting MPI M9DSE process with rank "+to_string(rank)+" on base path "+base_path);
 
 #else
 	rank = 0;
 	string base_path = string(getenv(BASE_DIR));
-	logfile = base_path +string(EE_LOG_PATH);
+	string m9dsepath = base_path+string(M9DSE_PATH);
+	logfile = base_path +string(M9DSE_LOG_FILE);
 	write_to_log(rank,logfile,"Starting M9DSE process on base path "+base_path);
 #endif
 
 	UserInterface *ui;
-	ui = new UserInterface(base_path);
+	ui = new UserInterface(m9dsepath);
 	ui->interact();
 
 #ifdef M9DSE_MPI

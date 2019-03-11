@@ -60,7 +60,7 @@ bool CFuzzyFunctionApproximation::Learn(Configuration conf, Simulation sim, Mode
 	appoggio[0] = double(p.L_s_int.get_pos(conf.integer_units));
 	appoggio[17] = double(mem.L2U.associativity.get_pos(conf.L2U_assoc));
 	appoggio[18] = double(sim.avg_err_VGS);
-	appoggio[19] = double(sim.avg_err_vds);
+	appoggio[19] = double(sim.avg_err_VDS);
 	 */
 	return (Learn(appoggio,&(appoggio[18])));
 }
@@ -86,11 +86,11 @@ Simulation CFuzzyFunctionApproximation::Estimate1(Configuration conf, ModelInver
 	 */
 	EstimateG(appoggio,&(appoggio[18]));
 	sim.config = conf;
-	sim.avg_err_id = -1.0f;
+	sim.avg_err_ID = -1.0f;
 	sim.avg_err_VGS = double(appoggio[18]);
-	sim.avg_err_vds = double(appoggio[19]);
+	sim.avg_err_VDS = double(appoggio[19]);
 	sim.simulated = false;
-	cout << "\n-----------Estimate 1 : " << sim.avg_err_VGS << " __ " << sim.avg_err_vds;
+	cout << "\n-----------Estimate 1 : " << sim.avg_err_VGS << " __ " << sim.avg_err_VDS;
 	return (sim);
 }
 

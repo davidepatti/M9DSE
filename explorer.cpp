@@ -14,23 +14,50 @@ Space_mask Explorer::get_space_mask(Mask_type mask_type) const {
     //mask.gpr_static_size = false;
     switch (mask_type) {
         case SET_ALL:
+            mask.L_d_int = true;
+            mask.L_s_int = true;
+            mask.L_g_int = true;
+            mask.L_d_pin = true;
+            mask.L_s_pin = true;
+            mask.L_g_pin = true;
+            mask.L_dH_ext = true;
+            mask.L_sH_ext = true;
+            mask.L_gH_ext = true;
+            mask.L_dL_ext = true;
+            mask.L_sL_ext = true;
+            mask.L_gL_ext = true;
+            mask.L_Hwire = true;
+            mask.L_Lwire = true;
         case UNSET_ALL:
-            ;
-            //mask.gpr_static_size = true;
+            mask.L_d_int =  false;
+            mask.L_s_int =  false;
+            mask.L_g_int =  false;
+            mask.L_d_pin =  false;
+            mask.L_s_pin =  false;
+            mask.L_g_pin =  false;
+            mask.L_dH_ext = false;
+            mask.L_sH_ext = false;
+            mask.L_gH_ext = false;
+            mask.L_dL_ext = false;
+            mask.L_sL_ext = false;
+            mask.L_gL_ext = false;
+            mask.L_Hwire = false;
+            mask.L_Lwire = false;
     }
 
     return mask;
 }
 //********************************************************************
-Explorer::Explorer(MatlabInterface * ti)
+Explorer::Explorer(MatlabInterface * pInterface)
 {
-    this->anInterface = ti;
+    this->matlabInterface = pInterface;
     // when simulation is started these values will be calculated
     // to be more realistic
 
-    // by default objectives include avg_err_vds and average power
-    Options.objective_id = false;
-    Options.objective_vds = true;
+    // by default objectives include avg_err_VDS and average power
+    Options.objective_avg_errID = true;
+    Options.objective_avg_errVDS = true;
+    Options.objective_avg_errVGS = true;
 
     Options.save_spaces = false;
     Options.save_estimation = false;
@@ -39,28 +66,17 @@ Explorer::Explorer(MatlabInterface * ti)
     force_simulation = false;
     function_approx = NULL;
 
-    string space_dir = get_base_dir()+"/SUBSPACES/";
-    string space_file = space_dir+"current.sub";
+    string space_file = getenv(BASE_DIR)+string(M9DSE_PATH)+string(CONFIG_SPACE_FILE);
 
-    char target_space_file[140];
-    int l = readlink(space_file.c_str(),target_space_file,140);
-    if (l!=-1)
-    {
-        load_space_file(space_file);
-        target_space_file[l] = '\0';
-    }
-    else
-    {
-        cout << "\nError while setting subspace " << target_space_file << ". Check that symbolic link";
-        cout << "\n'current.sub' in " << space_dir << " it's properly set to point to a valid subspace file!";
-    }
+    load_space_file(space_file);
 }
 
 //********************************************************************
 
 Explorer::~Explorer()
 {
-    string logfile = get_base_dir()+string(EE_LOG_PATH);
+    string logfile;
+    logfile = get_base_dir() + string(M9DSE_LOG_FILE);
     write_to_log(get_mpi_rank(),logfile,"Destroying explorer class");
 }
 
@@ -73,9 +89,9 @@ void Explorer::set_options(const struct UserSettings& user_settings)
     // Number of objectives
     n_obj = 0;
 
-    if (Options.objective_VGS) n_obj++;
-    if (Options.objective_vds) n_obj++;
-    if (Options.objective_id) n_obj++;
+    if (Options.objective_avg_errVGS) n_obj++;
+    if (Options.objective_avg_errVDS) n_obj++;
+    if (Options.objective_avg_errID) n_obj++;
 
 }
 
@@ -91,44 +107,67 @@ Configuration Explorer::create_configuration(const ModelInverter &p) const //db
 {
     Configuration conf;
 
-    // TODO M9DSE - add correct parameters of config
-    /*
-    conf.gpr_static_size = model_inverter.gpr_static_size.get_val();
-    conf.fpr_static_size = model_inverter.fpr_static_size.get_val();
-     */
-
+    conf.L_d_int= model_inverter.L_d_int.get_val();
+    conf.L_s_int = model_inverter.L_s_int.get_val();
+    conf.L_g_int = model_inverter.L_g_int.get_val();
+    conf.L_d_pin = model_inverter.L_d_pin.get_val();
+    conf.L_s_pin = model_inverter.L_s_pin.get_val();
+    conf.L_g_pin = model_inverter.L_g_pin.get_val();
+    conf.L_dH_ext = model_inverter.L_dH_ext.get_val();
+    conf.L_sH_ext = model_inverter.L_sH_ext.get_val();
+    conf.L_gH_ext = model_inverter.L_gH_ext.get_val();
+    conf.L_dL_ext = model_inverter.L_dL_ext.get_val();
+    conf.L_sL_ext = model_inverter.L_sL_ext.get_val();
+    conf.L_gL_ext = model_inverter.L_gL_ext.get_val();
+    conf.L_Hwire = model_inverter.L_Hwire.get_val();
+    conf.L_Lwire = model_inverter.L_Lwire.get_val();
     return conf;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 Configuration Explorer::create_configuration() const
 {
+    Configuration default_conf;
 
-    Configuration default_config;
+    default_conf.L_d_int  = this->model_inverter.L_d_int.get_default();
+    default_conf.L_s_int  = this->model_inverter.L_s_int.get_default();
+    default_conf.L_g_int  = this->model_inverter.L_g_int.get_default();
+    default_conf.L_d_pin  = this->model_inverter.L_d_pin.get_default();
+    default_conf.L_s_pin  = this->model_inverter.L_s_pin.get_default();
+    default_conf.L_g_pin  = this->model_inverter.L_g_pin.get_default();
+    default_conf.L_dH_ext = this->model_inverter.L_dH_ext.get_default();
+    default_conf.L_sH_ext = this->model_inverter.L_sH_ext.get_default();
+    default_conf.L_gH_ext = this->model_inverter.L_gH_ext.get_default();
+    default_conf.L_dL_ext = this->model_inverter.L_dL_ext.get_default();
+    default_conf.L_sL_ext = this->model_inverter.L_sL_ext.get_default();
+    default_conf.L_gL_ext = this->model_inverter.L_gL_ext.get_default();
+    default_conf.L_Hwire  = this->model_inverter.L_Hwire.get_default();
+    default_conf.L_Lwire  = this->model_inverter.L_Lwire.get_default();
 
-    // TODO M9DSE - add correct parameters of config
-    /*
-    default_config.gpr_static_size = model_inverter.gpr_static_size.get_default();
-    default_config.fpr_static_size = model_inverter.fpr_static_size.get_default();
-    default_config.pr_static_size = model_inverter.pr_static_size.get_default();
-     */
-
-    return default_config;
+    return default_conf;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 Configuration Explorer::create_configuration(const Space_mask& mask,const Configuration& base) const
 {
-    Configuration config = create_configuration();
+    Configuration conf = create_configuration();
 
-    // TODO M9DSE - add correct parameters of config
 
-    /*
-    if (mask.L1D_size) config.L1D_size=base.L1D_size;
-    if (mask.L1D_block) config.L1D_block=base.L1D_block;
-    if (mask.L1D_assoc) config.L1D_assoc=base.L1D_assoc;
-     */
-    return config;
+    if (mask.L_d_int ) conf.L_d_int = base.L_d_int;
+    if (mask.L_s_int ) conf.L_s_int = base.L_s_int;
+    if (mask.L_g_int ) conf.L_g_int = base.L_g_int;
+    if (mask.L_d_pin ) conf.L_d_pin = base.L_d_pin;
+    if (mask.L_s_pin ) conf.L_s_pin = base.L_s_pin;
+    if (mask.L_g_pin ) conf.L_g_pin = base.L_g_pin;
+    if (mask.L_dH_ext) conf.L_dH_ext = base.L_dH_ext;
+    if (mask.L_sH_ext) conf.L_sH_ext = base.L_sH_ext;
+    if (mask.L_gH_ext) conf.L_gH_ext = base.L_gH_ext;
+    if (mask.L_dL_ext) conf.L_dL_ext = base.L_dL_ext;
+    if (mask.L_sL_ext) conf.L_sL_ext = base.L_sL_ext;
+    if (mask.L_gL_ext) conf.L_gL_ext = base.L_gL_ext;
+    if (mask.L_Hwire ) conf.L_Hwire = base.L_Hwire;
+    if (mask.L_Lwire ) conf.L_Lwire = base.L_Lwire;
+    return conf;
 }
 ////////////////////////////////////////////////////////////////////////////
 Space_mask Explorer::negate_mask(Space_mask mask)
@@ -156,15 +195,15 @@ void Explorer::remove_dominated_simulations(vector<Simulation>& sims)
 // ********************************************************************
 double Explorer::distance(const Simulation& s1, const Simulation& s2)
 {
-    if ( (Options.objective_id) && (Options.objective_VGS) && (Options.objective_vds) )
-        return sqrt(pow(s1.avg_err_id-s2.avg_err_id,2)+ pow(s1.avg_err_VGS-s2.avg_err_VGS,2) + pow(double(s1.avg_err_vds-s2.avg_err_vds),2) );
+    if ( (Options.objective_avg_errID) && (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
+        return sqrt(pow(s1.avg_err_ID-s2.avg_err_ID,2)+ pow(s1.avg_err_VGS-s2.avg_err_VGS,2) + pow(double(s1.avg_err_VDS-s2.avg_err_VDS),2) );
 
-    if ( (Options.objective_VGS) && (Options.objective_vds) )
-        return sqrt(pow(s1.avg_err_VGS-s2.avg_err_VGS,2) + pow(double(s1.avg_err_vds-s2.avg_err_vds),2) );
+    if ( (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
+        return sqrt(pow(s1.avg_err_VGS-s2.avg_err_VGS,2) + pow(double(s1.avg_err_VDS-s2.avg_err_VDS),2) );
 
 
-    if ( (Options.objective_id) && (Options.objective_vds) )
-        return sqrt(pow(s1.avg_err_id-s2.avg_err_id,2) + pow(double(s1.avg_err_vds-s2.avg_err_vds),2) );
+    if ( (Options.objective_avg_errID) && (Options.objective_avg_errVDS) )
+        return sqrt(pow(s1.avg_err_ID-s2.avg_err_ID,2) + pow(double(s1.avg_err_VDS-s2.avg_err_VDS),2) );
 
     cout << "\n\n The selected combination of objectives is not supported from";
     cout << "\n get_distance(...) function in explorer.cpp ";
@@ -193,7 +232,7 @@ void Explorer::start_EXHA()
     vector<Simulation> simulations = simulate_space(space);
     vector<Simulation> pareto_set = get_pareto(simulations);
 
-    string filename = Options.benchmark+"_EXHA";
+    string filename = "EXHA";
     save_simulations(simulations,filename+".exp");
     save_simulations(pareto_set,filename+".pareto.exp");
 
@@ -207,28 +246,29 @@ void Explorer::start_EXHA()
 
 vector<Simulation> Explorer::normalize(const vector<Simulation>& sims)
 {
-    vector<Simulation> sorted1 = sort_by_vds(sims);
+    vector<Simulation> sorted1 = sort_by_VDS(sims);
     vector<Simulation> sorted2 = sort_by_VGS(sims);
     vector<Simulation> sorted3 = sort_by_ID(sims);
 
-    double min_exec_time = sorted1[0].avg_err_vds;
-    double max_exec_time = sorted1[sorted1.size()-1].avg_err_vds;
+    double min_VDS = sorted1[0].avg_err_VDS;
+    double max_VDS = sorted1[sorted1.size()-1].avg_err_VDS;
 
     double min_VGS = sorted2[0].avg_err_VGS;
     double max_VGS = sorted2[sorted2.size()-1].avg_err_VGS;
 
-    double min_ID = sorted3[0].avg_err_id;
-    double max_ID = sorted3[sorted3.size()-1].avg_err_id;
+    double min_ID = sorted3[0].avg_err_ID;
+    double max_ID = sorted3[sorted3.size()-1].avg_err_ID;
 
     vector<Simulation> normalized;
 
     for (unsigned int i=0;i<sorted1.size();i++)
     {
-        Simulation temp_sim = sims[i];
+        Simulation temp_sim;
+        temp_sim = sims[i];
 
         temp_sim.avg_err_VGS = (temp_sim.avg_err_VGS)/(max_VGS);
-        temp_sim.avg_err_vds = (temp_sim.avg_err_vds)/(max_exec_time);
-        temp_sim.avg_err_id   = (temp_sim.avg_err_id)/(max_ID);
+        temp_sim.avg_err_VDS = (temp_sim.avg_err_VDS)/(max_VDS);
+        temp_sim.avg_err_ID   = (temp_sim.avg_err_ID) / max_ID;
 
         normalized.push_back(temp_sim);
     }
@@ -237,7 +277,7 @@ vector<Simulation> Explorer::normalize(const vector<Simulation>& sims)
 
 //**************************************************************
 // from min product to max product
-vector<Simulation> Explorer::sort_by_VGSvds_product(vector<Simulation> sims)
+vector<Simulation> Explorer::sort_by_VGSVDS_product(vector<Simulation> sims)
 {
     int min_index;
     double min_product;
@@ -249,10 +289,10 @@ vector<Simulation> Explorer::sort_by_VGSvds_product(vector<Simulation> sims)
 
         for (unsigned int i=0;i<sims.size();i++)
         {
-            if ( (sims[i].avg_err_vds)*(sims[i].avg_err_VGS)  <= min_product)
+            if ( (sims[i].avg_err_VDS)*(sims[i].avg_err_VGS)  <= min_product)
             {
-                //cout << "\nDEBUG:(i="<<i<< ") " << sims[i].avg_err_vds << " <= " << min_exec_time;
-                min_product= sims[i].avg_err_vds * sims[i].avg_err_VGS;
+                //cout << "\nDEBUG:(i="<<i<< ") " << sims[i].avg_err_VDS << " <= " << min_exec_time;
+                min_product= sims[i].avg_err_VDS * sims[i].avg_err_VGS;
                 min_index = i;
             }
         }
@@ -263,7 +303,7 @@ vector<Simulation> Explorer::sort_by_VGSvds_product(vector<Simulation> sims)
 }
 
 
-vector<Simulation> Explorer::sort_by_vds(vector<Simulation> sims)
+vector<Simulation> Explorer::sort_by_VDS(vector<Simulation> sims)
 {
     int min_index;
     double min_exec_time;
@@ -275,9 +315,9 @@ vector<Simulation> Explorer::sort_by_vds(vector<Simulation> sims)
 
         for (unsigned int i=0;i<sims.size();i++)
         {
-            if (sims[i].avg_err_vds<=min_exec_time)
+            if (sims[i].avg_err_VDS<=min_exec_time)
             {
-                min_exec_time=sims[i].avg_err_vds;
+                min_exec_time=sims[i].avg_err_VDS;
                 min_index = i;
             }
         }
@@ -287,7 +327,7 @@ vector<Simulation> Explorer::sort_by_vds(vector<Simulation> sims)
 
 #ifdef VERBOSE
     for (unsigned int i = 0;i<temp.size();i++)
-	cout << EE_TAG << "DEBUG temp(ordinato): " << temp[i].avg_err_vds;
+	cout << M9DSE_TAG << "DEBUG temp(ordinato): " << temp[i].avg_err_VDS;
 #endif
 
     return temp;
@@ -319,7 +359,7 @@ vector<Simulation> Explorer::sort_by_VGS(vector<Simulation> sims)
 
 #ifdef VERBOSE
     for (unsigned int i = 0;i<temp.size();i++)
-	cout << EE_TAG << "DEBUG (orderer E): " << temp[i].avg_err_VGS;
+	cout << M9DSE_TAG << "DEBUG (orderer E): " << temp[i].avg_err_VGS;
 #endif
     return temp;
 }
@@ -336,9 +376,9 @@ vector<Simulation> Explorer::sort_by_ID(vector<Simulation> sims)
 
         for (unsigned int i=0;i<sims.size();i++)
         {
-            if (sims[i].avg_err_id<=min_ID)
+            if (sims[i].avg_err_ID<=min_ID)
             {
-                min_ID=sims[i].avg_err_id;
+                min_ID=sims[i].avg_err_ID;
                 min_index = i;
             }
         }
@@ -348,7 +388,7 @@ vector<Simulation> Explorer::sort_by_ID(vector<Simulation> sims)
 
 #ifdef VERBOSE
     for (unsigned int i = 0;i<temp.size();i++)
-	cout << EE_TAG << "DEBUG (orderer ID): " << temp[i].avg_err_id;
+	cout << M9DSE_TAG << "DEBUG (orderer ID): " << temp[i].avg_err_ID;
 #endif
 
     return temp;
@@ -360,7 +400,7 @@ bool isDominated(Simulation sim, const vector<Simulation>& simulations)
 
     for(int i=0;i<simulations.size();++i)
     {
-        if ((sim.avg_err_VGS>=simulations[i].avg_err_VGS) && (sim.avg_err_vds>=simulations[i].avg_err_vds))
+        if ((sim.avg_err_VGS>=simulations[i].avg_err_VGS) && (sim.avg_err_VDS>=simulations[i].avg_err_VDS))
             return (true);
     }
 
@@ -371,29 +411,29 @@ bool isDominated(Simulation sim, const vector<Simulation>& simulations)
 // called 
 vector<Simulation> Explorer::get_pareto(const vector<Simulation>& simulations)
 {
-    if ( (Options.objective_id) && (Options.objective_VGS) && (Options.objective_vds) )
+    if ( (Options.objective_avg_errID) && (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return get_pareto3d(simulations);
 
-    if ( (Options.objective_VGS) && (Options.objective_vds) )
-        return get_pareto_CyclesPower(simulations);
+    if ( (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
+        return get_pareto_VDSVGS(simulations);
 
-    if ( (Options.objective_id) && (Options.objective_vds) )
-        return get_pareto_IDCycles(simulations);
+    if ( (Options.objective_avg_errID) && (Options.objective_avg_errVDS) )
+        return get_pareto_IDVDS(simulations);
     assert(false);
 }
 ////////////////////////////////////////////////////////////////////////////
-vector<Simulation> Explorer::get_pareto_CyclesPower(const vector<Simulation>& simulations)
+vector<Simulation> Explorer::get_pareto_VDSVGS(const vector<Simulation> &simulations)
 {
     double min_e = 1000000000000000.0;
 
     vector<Simulation> pareto_set;
-    vector<Simulation> sorted = sort_by_vds(simulations);
+    vector<Simulation> sorted = sort_by_VDS(simulations);
 
     while (sorted.size()>0)
     {
         if (sorted[0].avg_err_VGS<=min_e)
         {
-            if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_vds==sorted[0].avg_err_vds))
+            if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_VDS==sorted[0].avg_err_VDS))
                 pareto_set.pop_back();
 
             min_e = sorted[0].avg_err_VGS;
@@ -405,21 +445,21 @@ vector<Simulation> Explorer::get_pareto_CyclesPower(const vector<Simulation>& si
 }
 
 ////////////////////////////////////////////////////////////////////////////
-vector<Simulation> Explorer::get_pareto_IDCycles(const vector<Simulation>& simulations)
+vector<Simulation> Explorer::get_pareto_IDVDS(const vector<Simulation> &simulations)
 {
     double min_ID = 1000000000000000.0;
 
     vector<Simulation> pareto_set;
-    vector<Simulation> sorted = sort_by_vds(simulations);
+    vector<Simulation> sorted = sort_by_VDS(simulations);
 
     while (sorted.size()>0)
     {
-        if (sorted[0].avg_err_id<=min_ID)
+        if (sorted[0].avg_err_ID<=min_ID)
         {
-            if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_vds==sorted[0].avg_err_vds))
+            if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_VDS==sorted[0].avg_err_VDS))
                 pareto_set.pop_back();
 
-            min_ID = sorted[0].avg_err_id;
+            min_ID = sorted[0].avg_err_ID;
             pareto_set.push_back(sorted[0]);
         }
         sorted.erase(sorted.begin());
@@ -427,7 +467,7 @@ vector<Simulation> Explorer::get_pareto_IDCycles(const vector<Simulation>& simul
     return pareto_set;
 }
 ////////////////////////////////////////////////////////////////////////////
-vector<Simulation> Explorer::get_pareto_IDPower(const vector<Simulation>& simulations)
+vector<Simulation> Explorer::get_pareto_IDVGS(const vector<Simulation> &simulations)
 {
     double min_ID = 1000000000000000.0;
 
@@ -436,12 +476,12 @@ vector<Simulation> Explorer::get_pareto_IDPower(const vector<Simulation>& simula
 
     while (sorted.size()>0)
     {
-        if (sorted[0].avg_err_id<=min_ID)
+        if (sorted[0].avg_err_ID<=min_ID)
         {
             if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_VGS==sorted[0].avg_err_VGS))
                 pareto_set.pop_back();
 
-            min_ID = sorted[0].avg_err_id;
+            min_ID = sorted[0].avg_err_ID;
             pareto_set.push_back(sorted[0]);
         }
         sorted.erase(sorted.begin());
@@ -462,13 +502,13 @@ vector<Simulation> Explorer::get_pareto3d(const vector<Simulation>& simulations)
 
             if (   // if it is dominated...
                     (simulations[j].avg_err_VGS <= simulations[i].avg_err_VGS &&
-                     simulations[j].avg_err_id <= simulations[i].avg_err_id &&
-                     simulations[j].avg_err_vds <= simulations[i].avg_err_vds)
+                     simulations[j].avg_err_ID <= simulations[i].avg_err_ID &&
+                     simulations[j].avg_err_VDS <= simulations[i].avg_err_VDS)
                     &&
                     ( // ...but not from an identical sim
                             simulations[j].avg_err_VGS != simulations[i].avg_err_VGS ||
-                            simulations[j].avg_err_id != simulations[i].avg_err_id ||
-                            simulations[j].avg_err_vds != simulations[i].avg_err_vds)
+                            simulations[j].avg_err_ID != simulations[i].avg_err_ID ||
+                            simulations[j].avg_err_VDS != simulations[i].avg_err_VDS)
                     )
                 dominated = true;
 
@@ -479,7 +519,7 @@ vector<Simulation> Explorer::get_pareto3d(const vector<Simulation>& simulations)
 
     return pareto_set;
 }
-// power/avg_err_id pareto set
+// power/avg_err_ID pareto set
 
 
 
@@ -492,8 +532,8 @@ void Explorer::save_configurations(const vector<Configuration>& space, const str
     for (unsigned int i = 0;i< space.size();i++)
     {
         pseudo_sim.config = space[i];
-        pseudo_sim.avg_err_id = 0.0;
-        pseudo_sim.avg_err_vds = 0.0;
+        pseudo_sim.avg_err_ID = 0.0;
+        pseudo_sim.avg_err_VDS = 0.0;
         pseudo_sim.avg_err_VGS = 0.0;
         pseudo_sim.simulated = false;
         pseudo_sims.push_back(pseudo_sim);
@@ -520,14 +560,14 @@ void Explorer::save_simulations(const vector<Simulation>& simulations, const str
     string pretitle2 ="\n%% Objectives: ";
     //G
 
-    if (Options.objective_id) pretitle2+="ID, ";
-    if (Options.objective_VGS) pretitle2+="VGS, ";
-    if (Options.objective_vds) pretitle2+="VDS";
+    if (Options.objective_avg_errID) pretitle2+="ID, ";
+    if (Options.objective_avg_errVGS) pretitle2+="VGS, ";
+    if (Options.objective_avg_errVDS) pretitle2+="VDS";
 
     string title = "\n\n%% ";
 
     // currently, avg_err_VGS and power are mutually exclusive objectives
-    if (Options.objective_VGS) title+="ID\tVGS\tVDS";
+    if (Options.objective_avg_errVGS) title+="ID\tVGS\tVDS";
     else
         assert(false);
 
@@ -538,9 +578,9 @@ void Explorer::save_simulations(const vector<Simulation>& simulations, const str
 
     for (unsigned int i =0;i<simulations.size();i++)
     {
-        id = simulations[i].avg_err_id;
+        id = simulations[i].avg_err_ID;
         VGS = simulations[i].avg_err_VGS;
-        vds = simulations[i].avg_err_vds*1000;
+        vds = simulations[i].avg_err_VDS;
 
         string conf_string = simulations[i].config.get_header();
 
@@ -560,14 +600,11 @@ void Explorer::save_objectives_details(const Dynamic_stats& dyn,const Configurat
 
     string c = config.get_header();
 
-    // TODO M9FIX
-    /*
-    fprintf(fp,"\n %llu %llu %llu  %llu %s",
-            dyn.compute_cycles,
-            dyn.ialu,
-            c.c_str());
 
-     */
+    //
+    fprintf(fp,"\n %g %g %g %g %g %g %s", dyn.err_VGS_L, dyn.err_ID_L,
+            dyn.err_VDS_L, dyn.err_VGS_H, dyn.err_ID_H, dyn.err_VDS_H, c.c_str());
+
     fclose(fp);
 }
 
@@ -594,7 +631,7 @@ void Explorer::save_stats(const Exploration_stats& stats,const string& file)
 }
 
 /////////////////////////////////////////////////////////////////
-void Explorer::prepare_explorer(const string& application, const Configuration& config)
+void Explorer::prepare_explorer( const Configuration& config)
 {
     // Note that this fuction does NOT create any directory, but
     // simply sets explorer class members according to the app and configuration
@@ -612,7 +649,7 @@ void Explorer::save_estimation_file(const Dynamic_stats &dynamic_stats, const Es
 
     if (!output_file)
     {
-        string logfile = get_base_dir()+string(EE_LOG_PATH);
+        string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
         int myid = get_mpi_rank();
         write_to_log(myid,logfile,"WARNING: Error while saving " + file_path);
     }
@@ -947,9 +984,9 @@ int Explorer::simulation_present(const Simulation& sim,const vector<Simulation>&
     for (int i=0;i<simulations.size();++i)
     {
         if (
-                (simulations[i].avg_err_id == sim.avg_err_id) &&
+                (simulations[i].avg_err_ID == sim.avg_err_ID) &&
                 (simulations[i].avg_err_VGS == sim.avg_err_VGS) &&
-                (simulations[i].avg_err_vds == sim.avg_err_vds)
+                (simulations[i].avg_err_VDS == sim.avg_err_VDS)
                 )
             return (i);
     }
@@ -1056,7 +1093,7 @@ void Explorer::load_space_file(const string& filename)
 
     if (!input_file)
     {
-        string logfile = get_base_dir()+string(EE_LOG_PATH);
+        string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
         int myid = get_mpi_rank();
         write_to_log(myid,logfile,"ERROR: cannot load " + filename);
         exit(-1);
@@ -1064,12 +1101,12 @@ void Explorer::load_space_file(const string& filename)
     else
     {
 
-        go_until("[BEGIN_SPACE]",input_file);
+        cout << "LOADING SPACE (false)" << endl;
+        //go_until("[BEGIN_SPACE]",input_file);
 
         int val;
         vector<int> values;
 
-        assert(false);
         /* TODO M9DSE
         values.clear();
         input_file >> word; // skip parameter label
@@ -1092,7 +1129,7 @@ void Explorer::save_space_file(const string& filename)
     if (!output_file)
     {
         cout << "\n Error while saving " << filename ;
-        string logfile = get_base_dir()+string(EE_LOG_PATH);
+        string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
         int myid = get_mpi_rank();
         write_to_log(myid,logfile,"ERROR: cannot save " + filename);
         sleep(2);
@@ -1116,10 +1153,9 @@ void Explorer::save_space_file(const string& filename)
 
 }
 
-// TODO: shouldn't get it from matlab interface ?
 string Explorer::get_base_dir() const
 {
-    return base_dir;
+    return getenv(BASE_DIR);
 }
 ////////////////////////////////////////////////////////////////////////////
 void Explorer::test()

@@ -38,7 +38,6 @@ add_executable(M9DSE
         MPI.README
         parameter.cpp
         parameter.h
-        post_install.sh
         model_inverter.cpp
         model_inverter.h
         RuleList.cpp

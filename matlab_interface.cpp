@@ -4,9 +4,8 @@
 #include "common.h"
 #include <sys/stat.h>
 
-MatlabInterface::MatlabInterface(const string& base_dir)
+MatlabInterface::MatlabInterface()
 {
-	set_environment(base_dir);
     set_save_matlog(false);
 }
 
@@ -21,12 +20,6 @@ void MatlabInterface::set_save_matlog(bool save_log)
 	this->do_save_log = save_log;
 }
 
-
-// Paramters of interested when invoking tcc
-// IMPACT: -p to pass parameters file
-//
-
-
 void MatlabInterface::execute_sim(const string &path) //db
 {
 	char old_path[50];
@@ -39,7 +32,7 @@ void MatlabInterface::execute_sim(const string &path) //db
 	command = " ....";
 
 #ifdef DEBUG
-	cout << EE_TAG << "executing: " << command;
+	cout << M9DSE_TAG << "executing: " << command;
 #endif
 	system(command.c_str());
 	chdir(old_path);
@@ -59,7 +52,7 @@ Dynamic_stats MatlabInterface::get_dynamic_stats()
 	Dynamic_stats dynamic_stats;
 	dynamic_stats.valid = true; // set on false if continue_on_failure occurs
 
-	string logfile = base_path+string(EE_LOG_PATH);
+	string logfile = base_path+string(M9DSE_LOG_FILE);
 	int myid = get_mpi_rank();
 
 	struct stat st;
@@ -84,10 +77,8 @@ void MatlabInterface::set_environment(const string& base_dir) {
 
 	this->base_path = base_dir;
 
-	setenv("SUIFPATH","$SUIFPATH:/usr/bin",1);
-
 	string path = getenv("PATH");
-	path = path + base_dir + ":" +base_dir+IMPACT_REL_PATH+"/bin:";
+	path = path + base_dir;
 
 // when using mpi multiple processes, some addition paths can be added (see environment.h)
 #ifdef M9_MPI
@@ -105,7 +96,7 @@ void MatlabInterface::save_model_config(const ModelInverter &p, const string &pa
 
 	if (!output_file)
 	{
-		string logfile = base_path + string(EE_LOG_PATH);
+		string logfile = base_path + string(M9DSE_LOG_FILE);
 		int myid = get_mpi_rank();
 		write_to_log(myid,logfile,"FATAL ERROR: cannot save hmdes file " + filename);
 		exit(EXIT_FAILURE);
@@ -145,7 +136,7 @@ void MatlabInterface::load_model_config(ModelInverter *p, const string &filename
 	std::ifstream input_file(filename.c_str());
 
 	if (!input_file) {
-		string logfile = base_path + string(EE_LOG_PATH);
+		string logfile = base_path + string(M9DSE_LOG_FILE);
 		int myid = get_mpi_rank();
 		write_to_log(myid,logfile,"FATAL ERROR: cannot open hmdes file " + filename);
 		exit(EXIT_FAILURE);

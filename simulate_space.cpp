@@ -24,10 +24,10 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 	bool do_simulation = (force_simulation ||
 						  !(Options.approx_settings.enabled && function_approx->Reliable()));
 
-	string logfile = get_base_dir()+string(EE_LOG_PATH);
+	string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
 	int myid = get_mpi_rank();
 
-	write_to_log(myid,logfile,"Starting simulate_loop for " + Options.benchmark + " (space size: "+to_string(space.size())+")");
+	write_to_log(myid,logfile,"Starting simulate_loop (space size: "+to_string(space.size())+")");
 
 	for (unsigned int i = 0;i< space.size();i++)
 	{
@@ -38,25 +38,23 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 		this->model_inverter.set_config(space[i]);
 		current_sim.config = space[i];
 
-		prepare_explorer(Options.benchmark,space[i]); //DDD
-
 		if (do_simulation)
 		{
 
 			// TODO M9fix
-			anInterface->save_model_config(model_inverter,"TDB");
-			anInterface->execute_sim("TBD"); //db
+			matlabInterface->save_model_config(model_inverter,"TDB");
+			matlabInterface->execute_sim("TBD"); //db
 
 		}
 
-			dyn_stats = anInterface->get_dynamic_stats();
+			dyn_stats = matlabInterface->get_dynamic_stats();
 
 			estimate = estimator.get_estimate(dyn_stats);
-			current_sim.avg_err_id = estimate.avg_err_id;
-			current_sim.avg_err_vds = estimate.avg_err_VGS;
+			current_sim.avg_err_ID = estimate.avg_err_ID;
+			current_sim.avg_err_VDS = estimate.avg_err_VGS;
 			current_sim.simulated = true;//do_simulation;
 
-			if (Options.objective_VGS) current_sim.avg_err_VGS = estimate.avg_err_vds;
+			if (Options.objective_avg_errVGS) current_sim.avg_err_VGS = estimate.avg_err_VDS;
 
 			if (Options.approx_settings.enabled>0)
                 function_approx->Learn(space[i], current_sim, model_inverter);
@@ -70,7 +68,7 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 
             current_sim = function_approx->Estimate1(space[i],model_inverter,mem_hierarchy);
             current_sim.simulated = false;
-            current_sim.avg_err_id = estimator.get_processor_ID(model_inverter);
+            current_sim.avg_err_ID = estimator.get_processor_ID(model_inverter);
 
         }
         */
@@ -94,26 +92,26 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 				// M9_space_EXP_2.12, 12th explorated space of 2nd exploration algorithm
 				char name[40];
 				sprintf(name,"_simulatedspace_%d",n_simulate_space_call);
-				string filename = Options.benchmark+"_"+current_algo+"_"+string(name);
+				string filename = current_algo+"_"+string(name);
 				save_configurations(space,filename);
 			}
 
 			if (Options.save_estimation) // detailed and verbose estimator report
 			{
 				char temp[10];
-				string filename= Options.benchmark+"_"+current_algo+"_"+"."+string(temp)+".est";
+				string filename= current_algo+"_"+"."+string(temp)+".est";
 				save_estimation_file(dyn_stats,estimate, filename);	//db
 			}
 
 			if (Options.save_objectives_details) //
 			{
-				string filename= Options.benchmark+"_"+current_algo+"_"+".details";
+				string filename= current_algo+"_"+".details";
 				save_objectives_details(dyn_stats,current_sim.config,filename);
 			}
 			// -------------------------------------------------------------------
 		}
 
-	write_to_log(myid,logfile,"Finished simulate_loop for " + Options.benchmark + " (space size: "+to_string(space.size())+")");
+	write_to_log(myid,logfile,"Finished simulate_loop (space size: "+to_string(space.size())+")");
 	return simulations;
 }
 
@@ -124,7 +122,7 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	int myrank = get_mpi_rank(); // id of the current M9DSE process
 	int mysize = get_mpi_size(); // # of M9DSE processes running
 
-	string logfile = get_base_dir()+string(EE_LOG_PATH);
+	string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
 
 #ifdef M9DSE_MPI
 	MPI_Status status;
@@ -237,8 +235,8 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	for(int s = 0; s < counter; s++) {
 	    MPI_Recv(comms, 4, MPI_DOUBLE, p, 99, MPI_COMM_WORLD, &status); 
 	    current_sim.config = space2[s];
-	    current_sim.avg_err_id = comms[0];
-	    current_sim.avg_err_vds = comms[1];
+	    current_sim.avg_err_ID = comms[0];
+	    current_sim.avg_err_VDS = comms[1];
 	    current_sim.avg_err_VGS = comms[2];
 	    current_sim.clock_freq = comms[3]; //dovrebbe essere sempre la stessa...
 	    current_sim.simulated = true;//do_simulation;
@@ -285,7 +283,7 @@ int Explorer::simulate_space()
     MPI_Status status;
     int counter = 0;
     int myrank = get_mpi_rank();
-    string logfile = get_base_dir()+string(EE_LOG_PATH);
+    string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
 
     MPI_Recv(&counter, 1, MPI_INT, 0, 98, MPI_COMM_WORLD, &status);
     
@@ -298,7 +296,7 @@ int Explorer::simulate_space()
     MPI_Recv(bench_cstr,bench_len,MPI_CHAR,0,96,MPI_COMM_WORLD,&status);
     string bench(bench_cstr);
     Options.benchmark = bench;
-    anInterface->set_benchmark(Options.benchmark);
+    matlabInterface->set_benchmark(Options.benchmark);
 
     for(int i = 0; i<counter; i++) {
     	MPI_Recv(communicator,N_PARAMS,MPI_INT,0,99,MPI_COMM_WORLD,&status); //db
@@ -343,8 +341,8 @@ int Explorer::simulate_space()
     double comms[4];
     MPI_Send(&counter,1,MPI_INT,0,97, MPI_COMM_WORLD);
     for (int i=0; i<counter; i++) {
-    	comms[0] = simulations[i].avg_err_id;
-	comms[1] = simulations[i].avg_err_vds;
+    	comms[0] = simulations[i].avg_err_ID;
+	comms[1] = simulations[i].avg_err_VDS;
 	comms[2] = simulations[i].avg_err_VGS;
     	comms[3] = simulations[i].clock_freq;
 	MPI_Send(comms,4,MPI_DOUBLE,0,99, MPI_COMM_WORLD);

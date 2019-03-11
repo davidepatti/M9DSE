@@ -1,5 +1,6 @@
 #include "parameter.h"
 #include "common.h"
+#include "environment.h"
 #include <cstdlib>
 #include <math.h> //for round
 
@@ -79,7 +80,7 @@ void Parameter::set_val(double new_value)
 
     if (current==NOT_VALID)
     {
-        string logfile = string(getenv(BASE_DIR))+string(EE_LOG_PATH);
+        string logfile = string(getenv(BASE_DIR))+string(M9DSE_LOG_FILE);
         int myid = get_mpi_rank();
         write_to_log(myid,logfile," ERROR: not valid value for parameter '"+label+" (value=" + to_string(new_value) + "). Check subspace file.");
         exit(EXIT_FAILURE);

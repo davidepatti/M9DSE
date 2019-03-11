@@ -8,29 +8,15 @@
 #endif
 bool Configuration::is_feasible()
 {
-    assert(false);
-    return false;
+    return true;
 }
 
-void Configuration::invalidate()
-{
-    assert(false);
-}
 
-bool Configuration::check_difference(const Configuration& conf, Space_mask mask)
-{
-
-    assert(false);
-    return false;
-}
 
 string Configuration::get_header() const
 {
-    char s[100];
-    // TODO M9FIX
-    assert(false);
-
-    return string(s);
+    string s = "L_d_int L_s_int L_g_int L_d_pin L_s_pin L_g_pin L_dH_ext L_sH_ext L_gH_ext L_dL_ext L_sL_ext L_gL_ext L_Hwire L_Lwire";
+    return s;
 
 }
 
@@ -42,32 +28,23 @@ string Configuration::get_executable_dir() const
     return string(s);
 }
 
-string Configuration::get_mem_dir() const
-{
-    assert(false);
-    char s[100];
-
-    return string(s);
-}
 
 
-//G
 void Simulation::add_simulation(const Simulation& other)
 {
-    //assert(config == other.config); // same configuration
-    if(avg_err_VGS_v.size() == 0 &&  avg_err_id_v.size() == 0 && avg_err_vds_v.size() == 0){ // single to multi-valued transform
+    if(avg_err_VGS_v.size() == 0 &&  avg_err_ID_v.size() == 0 && avg_err_VDS_v.size() == 0){ // single to multi-valued transform
         avg_err_VGS_v.push_back(avg_err_VGS);
-        avg_err_id_v.push_back(avg_err_id);
-        avg_err_vds_v.push_back(avg_err_vds);
+        avg_err_ID_v.push_back(avg_err_ID);
+        avg_err_VDS_v.push_back(avg_err_VDS);
     }
-    if(other.avg_err_VGS_v.size()>0 &&  other.avg_err_id_v.size()>0 && avg_err_vds_v.size()>0) { // multiple valued simulation
+    if(other.avg_err_VGS_v.size()>0 &&  other.avg_err_ID_v.size()>0 && avg_err_VDS_v.size()>0) { // multiple valued simulation
         avg_err_VGS_v.insert(avg_err_VGS_v.end(), other.avg_err_VGS_v.begin(), other.avg_err_VGS_v.end());
-        avg_err_id_v.insert(avg_err_id_v.end(), other.avg_err_id_v.begin(), other.avg_err_id_v.end());
-        avg_err_vds_v.insert(avg_err_vds_v.end(), other.avg_err_vds_v.begin(), other.avg_err_vds_v.end());
+        avg_err_ID_v.insert(avg_err_ID_v.end(), other.avg_err_ID_v.begin(), other.avg_err_ID_v.end());
+        avg_err_VDS_v.insert(avg_err_VDS_v.end(), other.avg_err_VDS_v.begin(), other.avg_err_VDS_v.end());
     } else { // single valued simulation
         avg_err_VGS_v.push_back(other.avg_err_VGS);
-        avg_err_id_v.push_back(other.avg_err_id);
-        avg_err_vds_v.push_back(other.avg_err_vds);
+        avg_err_ID_v.push_back(other.avg_err_ID);
+        avg_err_VDS_v.push_back(other.avg_err_VDS);
     }
     // update mean values
     vector<double>::iterator it;
@@ -77,13 +54,13 @@ void Simulation::add_simulation(const Simulation& other)
     //cout<<"\n VGS: "<< avg_err_VGS <<" sum/size: "<< sum << "/" << avg_err_VGS_v.size() << endl;
     avg_err_VGS = sum / avg_err_VGS_v.size();
     sum = 0;
-    for(it = avg_err_id_v.begin(); it != avg_err_id_v.end(); it++)
+    for(it = avg_err_ID_v.begin(); it != avg_err_ID_v.end(); it++)
         sum += *it;
-    avg_err_id = sum / avg_err_id_v.size();
+    avg_err_ID = sum / avg_err_ID_v.size();
     sum = 0;
-    for(it = avg_err_vds_v.begin(); it != avg_err_vds_v.end(); it++)
+    for(it = avg_err_VDS_v.begin(); it != avg_err_VDS_v.end(); it++)
         sum += *it;
-    avg_err_vds = sum / avg_err_vds_v.size();
+    avg_err_VDS = sum / avg_err_VDS_v.size();
 }
 
 
@@ -122,20 +99,6 @@ int count_word(const string& w, ifstream& ifs)
     return n;
 }
 
-bool file_exists(const string& filename)
-{
-    FILE *fp;
-    fp=fopen(filename.c_str(),"r");
-
-    if (fp!=NULL)
-    {
-        fclose(fp);
-        return true;
-    }
-
-    return false;
-}
-
 // redefinition of some commonly used C-style functions
 extern "C" int atoi(const char*);
 int atoi(const string& s)
@@ -162,13 +125,6 @@ double max(const double& a,const double& b)
     return b;
 }
 
-string noyes(int x)
-{
-    if (x==1) return string("no");
-    if (x==2) return string("yes");
-
-    return string("NOT_VALID noyes");
-}
 
 void write_to_log(int pid,const string& logfile,const string& message)
 {

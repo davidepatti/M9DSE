@@ -10,12 +10,11 @@
 UserInterface::UserInterface(const string& path){
 
 	base_path = path;
-	string M9_path = base_path + "/matlab-workspace/M9-explorer/";
 
-	matlab_interface = new MatlabInterface(base_path);
+	matlab_interface = new MatlabInterface();
 	my_explorer = new Explorer(matlab_interface);
 
-	user_settings.default_settings_file = M9_path + "M9_default.conf";
+	user_settings.default_settings_file = base_path + "M9_default.conf";
 	load_settings(user_settings.default_settings_file);
 }
 
@@ -74,7 +73,7 @@ int UserInterface::show_menu()
 		system("clear");
 
 		cout << "\n =====================================================";
-		cout << "\n   e p i c   e x p l o r e r   [release "<< VERSION<<"]";
+		cout << "\n   M9DSE   [release "<< VERSION<<"]";
 		cout << "\n _____________________________________________________";
 		cout << "\n ______m a i n________________________________________" << endl;
 
@@ -86,19 +85,13 @@ int UserInterface::show_menu()
 		cout << "\n ______s p a c e___e x p l o r a t i o n______________" << endl;
 
 		cout << "\n [g] - Genetic based (GA)";
-		cout << "\n [d] - Dependency-graph based (DEP)";
 		cout << "\n [s] - Sensivity analysis (SAP)";
-		cout << "\n [p] - Pareto-based sensitivity (PBSA)";
 		cout << "\n [e] - Exhaustive (EXHA)";
 		cout << "\n [r] - Random (RANDOM)";
-		cout << "\n [x] - Schedule multiple explorations";
-		cout << "\n [v] - Re-evaluate pareto";
 		cout << "\n [t] - run Explorer::test() code";
 
 		cout << "\n _____________________________________________________";
 		cout << "\n _______m a n u a l___t e s t ________________________" << endl;
-		cout << "\n [1] - Compile hmdes file";
-		cout << "\n [2] - Compile benchmark";
 		cout << "\n [3] - Execute benchmark";
 		cout << "\n [4] - View execution statistics";
 		cout << "\n [5] - Estimate objectives";
@@ -115,10 +108,6 @@ int UserInterface::show_menu()
 
 	switch (ch)
 	{
-		case 'b':
-			if (myrank == 0) edit_user_settings();
-			break;
-
 		case 'h':
 			if (myrank == 0) info();
 			if (myrank == 0) wait_key();
@@ -170,19 +159,6 @@ int UserInterface::show_menu()
 			}
 			break;
 
-		case 'p':
-			if (myrank == 0) {
-				start_exploration_message();
-				cout << "\n\n Start exploration (y/n) ? ";
-				cin >> ch;
-				if (ch=='y') my_explorer->start_PBSA();
-			}
-			break;
-		case 'x':
-			if (myrank == 0) {
-				schedule_explorations();
-			}
-			break;
 
 		case 'e':
 
@@ -293,9 +269,9 @@ void UserInterface::edit_user_settings()
 
 		cout << "\n  S e t t i n g s  ";
 		cout << "\n ----------------------------------------------------------";
-		cout << "\n  (1) - Objective ID               --> " << status_string(user_settings.objective_id);
-		cout << "\n  (2) - Objective VDS     --> " << status_string(user_settings.objective_vds);
-		cout << "\n  (3) - Objective VGS             --> " << status_string(user_settings.objective_VGS);
+		cout << "\n  (1) - Objective ID               --> " << status_string(user_settings.objective_avg_errID);
+		cout << "\n  (2) - Objective VDS     --> " << status_string(user_settings.objective_avg_errVDS);
+		cout << "\n  (3) - Objective VGS             --> " << status_string(user_settings.objective_avg_errVGS);
 		cout << "\n  (5) - save simulated spaces        --> " << status_string(user_settings.save_spaces);
 		cout << "\n  (8) - Save matlab tcc logs       --> " << status_string(user_settings.save_matlog);
 		cout << "\n  (9) - save estimation detail files --> " << status_string(user_settings.save_estimation);
@@ -315,9 +291,9 @@ void UserInterface::edit_user_settings()
 
 		cin >> ch;
 
-		if (ch=="1") user_settings.objective_id =   !user_settings.objective_id;
-		if (ch=="2") user_settings.objective_vds = !user_settings.objective_vds;
-		if (ch=="3") user_settings.objective_VGS = !user_settings.objective_VGS;
+		if (ch=="1") user_settings.objective_avg_errID =   !user_settings.objective_avg_errID;
+		if (ch=="2") user_settings.objective_avg_errVDS = !user_settings.objective_avg_errVDS;
+		if (ch=="3") user_settings.objective_avg_errVGS = !user_settings.objective_avg_errVGS;
 		if (ch=="5") user_settings.save_spaces = !user_settings.save_spaces;
 		if (ch=="8")
 		{
@@ -370,7 +346,7 @@ void UserInterface::info()
 	cout << "\n";
 	cout << "\n For usage instructions see README file.";
 	cout << "\n";
-	cout << "\n For more informations on avg_err_id, power, avg_err_VGS estimation models and";
+	cout << "\n For more informations on avg_err_ID, power, avg_err_VGS estimation models and";
 	cout << "\n DSE algorithms implemented in M9DSE Explorer please refer to documentation";
 	cout << "\n section in: ";
 	cout << "\n" ;
@@ -439,10 +415,9 @@ void UserInterface::load_settings(string settings_file)
 	if (fp==NULL)
 	{
 		cout << "\n WARNING:configuration file not found... creating it ";
-		user_settings.benchmark = DEFAULT_BENCH;
-		user_settings.objective_id = false;
-		user_settings.objective_vds = true;
-		user_settings.objective_VGS = false;
+		user_settings.objective_avg_errID = false;
+		user_settings.objective_avg_errVDS = true;
+		user_settings.objective_avg_errVGS = false;
 		user_settings.save_spaces = false;
 		user_settings.save_estimation = false;
 		user_settings.approx_settings.enabled = 0;
@@ -468,29 +443,27 @@ void UserInterface::load_settings(string settings_file)
 	}
 	else
 	{
-		user_settings.objective_id = false;
-		user_settings.objective_vds = false;
-		user_settings.objective_VGS = false;
+		cout << "LOADING SETTINGS (false)"<< endl;
+	    /*
+		user_settings.objective_avg_errID = false;
+		user_settings.objective_avg_errVDS = false;
+		user_settings.objective_avg_errVGS = false;
 		user_settings.save_spaces = false;
 		user_settings.save_estimation = false;
 		user_settings.save_matlog = false;
         user_settings.save_restore = false;
 
-		go_until("benchmark",input_file);
+		go_until("avg_err_ID",input_file);
 		input_file >> word;
-		user_settings.benchmark = word;
+		if (word=="ENABLED") user_settings.objective_avg_errID = true;
 
-		go_until("avg_err_id",input_file);
+		go_until("avg_err_VDS",input_file);
 		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_id = true;
-
-		go_until("cycles",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_vds = true;
+		if (word=="ENABLED") user_settings.objective_avg_errVDS = true;
 
 		go_until("avg_err_VGS",input_file);
 		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_VGS = true;
+		if (word=="ENABLED") user_settings.objective_avg_errVGS = true;
 
 		go_until("save_spaces",input_file);
 		input_file >> word;
@@ -501,44 +474,27 @@ void UserInterface::load_settings(string settings_file)
 		input_file >> word;
 		if (word=="ENABLED") user_settings.save_estimation = true;
 
-
-		go_until("fuzzy_enabled",input_file);
-		input_file >> user_settings.approx_settings.enabled;
-
-		go_until("fuzzy_threshold",input_file);
-		input_file >> user_settings.approx_settings.threshold;
-
-		go_until("fuzzy_min",input_file);
-		input_file >> user_settings.approx_settings.min;
-
-		go_until("fuzzy_max",input_file);
-		input_file >> user_settings.approx_settings.max;
-
-		go_until("save_restore",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.save_restore = true;
-
 		go_until("save_matlog",input_file);
 		input_file >> word;
 		if (word=="ENABLED") user_settings.save_matlog= true;
 
 
 
-
         matlab_interface->set_save_matlog(user_settings.save_matlog);
 
 		my_explorer->set_options(user_settings);
+	     */
 	}
 }
 
 void UserInterface::save_settings_wrapper()
 {
-	string base_dir = base_path + "/matlab-workspace/M9-explorer/";
+	string dir = getenv(BASE_DIR)+string(M9DSE_PATH);
 
 	cout << "\n User settings file will be saved in: ";
-	cout << "\n " << base_dir ;
+	cout << "\n " << dir ;
 
-	save_settings(base_dir+"M9_default.conf");
+	save_settings(dir+"M9_default.conf");
 }
 
 
@@ -555,130 +511,24 @@ void UserInterface::save_settings(string settings_file)
 	{
 		output_file << "\n\n# M9DSE Explorer settings";
 
-		output_file << "\nbenchmark "  << user_settings.benchmark ;
-		output_file << "\navg_err_id " << status_string(user_settings.objective_id);
-		output_file << "\ncycles " << status_string(user_settings.objective_vds);
-		output_file << "\navg_err_VGS " << status_string(user_settings.objective_VGS);
+		output_file << "\navg_err_ID " << status_string(user_settings.objective_avg_errID);
+		output_file << "\navg_err_VDS " << status_string(user_settings.objective_avg_errVDS);
+		output_file << "\navg_err_VGS " << status_string(user_settings.objective_avg_errVGS);
 		output_file << "\nsave_spaces " << status_string(user_settings.save_spaces);
 		output_file << "\nsave_estimation " << status_string(user_settings.save_estimation);
-		output_file << "\nfuzzy_enabled " << user_settings.approx_settings.enabled;
-		output_file << "\nfuzzy_threshold " << user_settings.approx_settings.threshold;
-		output_file << "\nfuzzy_min " << user_settings.approx_settings.min;
-		output_file << "\nfuzzy_max " << user_settings.approx_settings.max;
-		output_file << "\nsave_restore " << status_string(user_settings.save_restore);
 		output_file << "\nsave_matlog " << status_string(user_settings.save_matlog);
 
 		cout << "\n Ok, saved current settings in " << settings_file;
 	}
 }
 
-void UserInterface::schedule_explorations()
-{
-
-	cout << "\n Ok, you must enter a string containing a character for each exploration";
-	cout << "\n to be scheduled.";
-	cout << "\n Legend:";
-	cout << "\n g -> GA\n s -> SAP\n p -> PBSA\n r -> Random\n d -> DEP\n z -> DEP2\n m -> DEPMOD";
-	cout << "\n\n Enter a schedule string:";
-	string schedule_string;
-	cin >> schedule_string;
-
-	string::size_type ga_pos = schedule_string.find("g");
-	string::size_type random_pos = schedule_string.find("r");
-
-	struct GA_parameters ga_parameters;
-	int n_random;
-
-	if (ga_pos!=string::npos)
-	{
-		cout << "\n Schedule sequence contains GA . You must enter informations ";
-		cout << "\n needed for this kind of exploration . ";
-
-		cout << "\n\n GA based approach ";
-		cout << "\n-------------------------------";
-		cout << "\n\n Population size: ";
-		cin >> ga_parameters.population_size;
-		cout << " Crossover prob: ";
-		cin >> ga_parameters.pcrossover;
-		cout << " Mutation prob: ";
-		cin >> ga_parameters.pmutation;
-		cout << " Max Generations: ";
-		cin >> ga_parameters.max_generations;
-		cout << "\n Report pareto step: ";
-		cin >> ga_parameters.report_pareto_step;
-	}
-
-	if (random_pos!=string::npos)
-	{
-
-		cout << "\n Schedule sequence contains RANDOM exploration.  ";
-		cout << "\n How many random configuration must be explored ?";
-		cin >> n_random;
-		cout << "\n Enter random seed (0 = auto):";
-		cin >> seed;
-		if (seed==0)
-			srand((unsigned int)time((time_t*)NULL));
-		else
-			srand(seed);
-	}
-
-	int i=0;
-
-// NOT SUPPORTED forking code
-// 
-//    if (fork()==0) // child process must perform exploration
-//    {
-//	signal(SIGHUP,SIG_IGN); // must ignore parent termination
-//	                        // useful to avoid abnormal
-//				// exploration stop when executing
-//				// from remoting shell
-//
-	while (i<schedule_string.size())
-	{
-		char ch = schedule_string[i];
-
-		switch (ch)
-		{
-			case 's':
-				cout << "\n Executing SAP ";
-				my_explorer->start_SAP();
-				break;
-			case 'p':
-				cout << "\n Executing PBSA ";
-				my_explorer->start_PBSA();
-				break;
-			case 'e':
-				cout << "\n Executing EXHAUSTIVE ";
-				my_explorer->start_EXHA();
-				break;
-			case 'g':
-				cout << "\n Executing GA ";
-				my_explorer->start_GA(ga_parameters);
-				break;
-			case 'r':
-				cout << "\n Executing RAND ";
-				my_explorer->start_RAND(n_random);
-				break;
-			default:
-				cout << "\n Error in schedule string ";
-				wait_key();
-				break;
-		}
-
-		i++;
-	}
-
-//	exit(0);
-//   }
-//   cout << "\n Il padre continua come se nulla fosse ";
-}
 
 
 void UserInterface::reload_system_config()
 {
     assert(false);
     // TODO M9DSE
-	string filename = base_path+"/matlab-workspace/M9-explorer/step_by_step/machines/"+EXPLORER_HMDES2;
+	string filename = base_path+"/matlab-workspace/M9-explorer/step_by_step/machines/";
 	cout << "\n\n Loading model_inverter configuration: " << filename;
     matlab_interface->load_model_config(&(my_explorer->model_inverter), filename);
 
