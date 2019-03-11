@@ -26,7 +26,8 @@ static unsigned int mylog2 (unsigned int val) {
 }
 
 /*---ALLELE---*/
-typedef int allele;
+//typedef int allele;
+typedef double allele;
 
 
 /*---ALLELESET---*/
