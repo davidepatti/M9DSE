@@ -3,7 +3,7 @@
 //********************************************************************
 // N Random  explorations of configuration space
 //*******************************************************************
-void Explorer::start_RAND(int n)
+void Explorer::start_RAND(int random_size)
 {
 
 	current_algo = "RAND";
@@ -19,10 +19,10 @@ void Explorer::start_RAND(int n)
 	string header = "["+current_algo+"] ";
 	string filename = "RAND_";
 	string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
-	string message = header+"Building random space for " + to_string(n) + " simulations...";
+	string message = header+"Building random space for " + to_string(random_size) + " simulations...";
 	write_to_log(my_ID,logfile,message);
 
-	for(int i=0;i<n;i++)
+	for(int i=0;i<random_size;i++)
 	{
 		//model_inverter.num_clusters.set_random();
 
@@ -53,7 +53,7 @@ void Explorer::start_RAND(int n)
 	stats.space_size = get_space_size();
 	stats.start_time = time(NULL);
 
-	message = header+ "Valid configurations:" + to_string(valid) + " of "+to_string(n)+" requested";
+	message = header+ "Valid configurations:" + to_string(valid) + " of "+to_string(random_size)+" requested";
 	write_to_log(my_ID,logfile,message);
 
 	vector<Simulation> rand_sims = simulate_space(random_space);

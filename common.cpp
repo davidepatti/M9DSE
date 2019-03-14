@@ -13,10 +13,25 @@ bool Configuration::is_feasible()
 
 
 
-string Configuration::get_header() const
+string Configuration::get_string() const
 {
-    string s = "L_d_int L_s_int L_g_int L_d_pin L_s_pin L_g_pin L_dH_ext L_sH_ext L_gH_ext L_dL_ext L_sL_ext L_gL_ext L_Hwire L_Lwire";
-    return s;
+    char s[200];
+    sprintf(s,"%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g\t%g",
+            L_d_int,
+            L_s_int,
+            L_g_int,
+            L_d_pin,
+            L_s_pin,
+            L_g_pin,
+            L_dH_ext,
+            L_sH_ext,
+            L_gH_ext,
+            L_dL_ext,
+            L_sL_ext,
+            L_gL_ext,
+            L_Hwire,
+            L_Lwire);
+    return string(s);
 
 }
 

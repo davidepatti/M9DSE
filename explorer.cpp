@@ -543,52 +543,38 @@ void Explorer::save_configurations(const vector<Configuration>& space, const str
 ////////////////////////////////////////////////////////////////////////////
 void Explorer::save_simulations(const vector<Simulation>& simulations, const string& filename)
 {
-    double id,VGS;
-    double VGSVDS;
-    double vds;
+    double ID,VGS,VDS;
 
     FILE * fp;
 
     string path = get_base_dir();
 
-    string file_path = path+filename;
+    string file = path+string(M9DSE_PATH)+filename;
+    fp=fopen(file.c_str(),"w");
 
     time_t now = time(NULL);
     string uora = string(asctime(localtime(&now)));
     string pretitle = "\n%% M9DSE Explorer simulation file - created on " + uora;
 
-    string pretitle2 ="\n%% Objectives: ";
-    //G
-
-    if (Options.objective_avg_errID) pretitle2+="ID, ";
-    if (Options.objective_avg_errVGS) pretitle2+="VGS, ";
-    if (Options.objective_avg_errVDS) pretitle2+="VDS";
-
     string title = "\n\n%% ";
 
-    // currently, avg_err_VGS and power are mutually exclusive objectives
-    if (Options.objective_avg_errVGS) title+="ID\tVGS\tVDS";
-    else
-        assert(false);
-
-    fp=fopen(file_path.c_str(),"w");
-
     fprintf(fp,"\n%% ----------------------------------------------");
+    // currently, avg_err_VGS and power are mutually exclusive objectives
+    title+="ID\tVGS\tVDS\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
+
+    fprintf(fp,"\n%% %s",title.c_str());
     fprintf(fp,"\n%% ----------------------------------------------");
 
     for (unsigned int i =0;i<simulations.size();i++)
     {
-        id = simulations[i].avg_err_ID;
+        ID = simulations[i].avg_err_ID;
         VGS = simulations[i].avg_err_VGS;
-        vds = simulations[i].avg_err_VDS;
+        VDS = simulations[i].avg_err_VDS;
 
-        string conf_string = simulations[i].config.get_header();
+        string conf_string = simulations[i].config.get_string();
 
 
-        char ch = ' ';
-        if (!simulations[i].simulated) ch = '*';
-
-        fprintf(fp,"\n%.9f  %.9f  %.9f %%/  %s %c",id,VGS,vds,conf_string.c_str(),ch);
+        fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%s",ID,VGS,VDS,conf_string.c_str());
     }
     fclose(fp);
 }
@@ -598,7 +584,7 @@ void Explorer::save_objectives_details(const Dynamic_stats& dyn,const Configurat
     FILE * fp;
     fp=fopen(filename.c_str(),"a");
 
-    string c = config.get_header();
+    string c = config.get_string();
 
 
     //
@@ -1013,7 +999,8 @@ long double Explorer::get_space_size(const Space_mask& mask) const
 {
     double size = 1;
 
-    assert(false);
+    //assert(false);
+    cout << "get_space_size FALSE" << endl;
 
     /* TODO: M9DSE
     if (mask.gpr_static_size) size = size*(model_inverter.gpr_static_size.get_size());
@@ -1100,24 +1087,110 @@ void Explorer::load_space_file(const string& filename)
     }
     else
     {
+        go_until("[BEGIN_SPACE]",input_file);
 
-        cout << "LOADING SPACE (false)" << endl;
-        //go_until("[BEGIN_SPACE]",input_file);
+        double default_val;
+        vector<double> values;
 
-        int val;
-        vector<int> values;
-
-        /* TODO M9DSE
         values.clear();
         input_file >> word; // skip parameter label
-        while ( (input_file>>val) && (val!=0)) { values.push_back(val); } // reads val until 0
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
         input_file >> word; // skip default label
-        input_file >> val;  // get default value
-        mem_hierarchy.L1D.block_size.set_values(values,val);
-         */
+        input_file >> default_val;  // get default value
+        model_inverter.L_d_int.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_s_int.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_g_int.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_d_pin.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_s_pin.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_g_pin.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_dH_ext.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_sH_ext.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_gH_ext.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_dL_ext.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_sL_ext.set_values(values,default_val);
 
 
-//end add db
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_gL_ext.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_Hwire.set_values(values,default_val);
+
+        values.clear();
+        input_file >> word; // skip parameter label
+        while ( (input_file>>default_val) && (default_val!=0)) { values.push_back(default_val); } // reads val until 0
+        input_file >> word; // skip default label
+        input_file >> default_val;  // get default value
+        model_inverter.L_Lwire.set_values(values,default_val);
+
     }
 
 }

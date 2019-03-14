@@ -526,11 +526,13 @@ void UserInterface::save_settings(string settings_file)
 
 void UserInterface::reload_system_config()
 {
-    assert(false);
+    cout << "RELOADING SYSTEM CONFIG (false)" << endl;
     // TODO M9DSE
+    /*
 	string filename = base_path+"/matlab-workspace/M9-explorer/step_by_step/machines/";
 	cout << "\n\n Loading model_inverter configuration: " << filename;
     matlab_interface->load_model_config(&(my_explorer->model_inverter), filename);
+     */
 
 }
 
@@ -538,38 +540,33 @@ void UserInterface::reload_system_config()
 void UserInterface::execute_benchmark() {
 
 	reload_system_config();
-	string base_dir = base_path + "/matlab-workspace/M9-explorer/step_by_step";
-    matlab_interface->execute_sim(base_dir);
+	matlab_interface->execute_sim();
 }
 
 
 void UserInterface::view_statistics() {
 
 	system("clear");
-	string simu_path = base_path + "/matlab-workspace/M9-explorer/step_by_step/simu_intermediate/";
-	Dynamic_stats dynamic_stats = matlab_interface->get_dynamic_stats();
+	Dynamic_stats stats = matlab_interface->get_dynamic_stats();
 
 	cout << "\n D y n a m i c  S t a t s ";
-	cout << "\n------------------------------------------------";
-	/* TODO M9DSE
-	cout << "\n            Total cycles: " << dynamic_stats.total_cycles;
-	 */
+	cout << "\n------------------------------------------------" << endl;
+	cout << " err_VGS_H\terr_VDS_H\terr_ID_H\terr_VGS_L\terr_VDS_L\terr_ID_L" << endl;
+	cout << stats.err_VGS_H << "\t"<< stats.err_VDS_H<<"\t"<< stats.err_ID_H << "\t" <<
+		    stats.err_VGS_L << "\t" << stats.err_VDS_L << "\t" << stats.err_ID_L << endl;
 }
 
 void UserInterface::compute_cost() {
-	assert(false);
 
 	system("clear");
-
-	string simu_path = base_path + "/matlab-workspace/M9-explorer/step_by_step/simu_intermediate/";
 
 	Dynamic_stats dynamic_stats = matlab_interface->get_dynamic_stats();
 	Estimate estimate = my_explorer->estimator.get_estimate(dynamic_stats);
 
-	cout << "\n  P e r f o r m a n c e ";
+	cout << "\n  O b j e c t i v e s ";
 	cout << "\n ----------------------------------------------------";
-	/* TODO M9DSE
-	cout << "\n   Total cycles executed: " << estimate.execution_cycles;
-	 */
+	cout << "\n avg_err_VGS: "<< estimate.avg_err_VGS << endl;
+	cout << "\n avg_err_VDS: "<< estimate.avg_err_VDS << endl;
+	cout << "\n avg_err_ID: "<< estimate.avg_err_ID << endl;
 }
 

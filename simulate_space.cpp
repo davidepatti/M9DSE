@@ -19,12 +19,9 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 	static int n_simulate_space_call = 0;
 	static int n_exploration_executed = 0;
 
-	// don't do simulation if a reliable fuzzy approximation is
-	// enabled
-	bool do_simulation = (force_simulation ||
-						  !(Options.approx_settings.enabled && function_approx->Reliable()));
-
 	string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
+	string matlab_params_file = get_base_dir()+string(MATLAB_WORKSPACE)+string(MATLAB_PARAMS_FILE);
+
 	int myid = get_mpi_rank();
 
 	write_to_log(myid,logfile,"Starting simulate_loop (space size: "+to_string(space.size())+")");
@@ -38,78 +35,52 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 		this->model_inverter.set_config(space[i]);
 		current_sim.config = space[i];
 
-		if (do_simulation)
+        matlabInterface->save_model_config(model_inverter,matlab_params_file);
+        matlabInterface->execute_sim(); //db
+
+        cout << "CIAOOOO" << endl;
+
+		dyn_stats = matlabInterface->get_dynamic_stats();
+
+		estimate = estimator.get_estimate(dyn_stats);
+		current_sim.avg_err_VGS = estimate.avg_err_VGS;
+		current_sim.avg_err_VDS = estimate.avg_err_VDS;
+		current_sim.avg_err_ID = estimate.avg_err_ID;
+		current_sim.simulated = true;//do_simulation;
+
+        simulations.push_back(current_sim);
+	}
+
+	// -------------------------------------------------------------------
+	//  when doing simulation some interesting info can be optionally saved
+	if (Options.save_spaces)
+	{
+		n_simulate_space_call++;
+		if (get_sim_counter()==0)
 		{
-
-			// TODO M9fix
-			matlabInterface->save_model_config(model_inverter,"TDB");
-			matlabInterface->execute_sim("TBD"); //db
-
+			n_simulate_space_call=1;
+			n_exploration_executed++;
 		}
+		// M9_space_EXP_2.12, 12th explorated space of 2nd exploration algorithm
+		char name[40];
+		sprintf(name,"_simulatedspace_%d",n_simulate_space_call);
+		string filename = current_algo+"_"+string(name);
+		save_configurations(space,filename);
+	}
 
-			dyn_stats = matlabInterface->get_dynamic_stats();
+	if (Options.save_estimation) // detailed and verbose estimator report
+	{
+		char temp[10];
+		string filename= current_algo+"_"+"."+string(temp)+".est";
+		save_estimation_file(dyn_stats,estimate, filename);	//db
+	}
 
-			estimate = estimator.get_estimate(dyn_stats);
-			current_sim.avg_err_ID = estimate.avg_err_ID;
-			current_sim.avg_err_VDS = estimate.avg_err_VGS;
-			current_sim.simulated = true;//do_simulation;
-
-			if (Options.objective_avg_errVGS) current_sim.avg_err_VGS = estimate.avg_err_VDS;
-
-			if (Options.approx_settings.enabled>0)
-                function_approx->Learn(space[i], current_sim, model_inverter);
-
-		}
-
-		/* TODO: re-enable
-        else   // NOT do simulation...
-        {   // using pproximation instead of simulation
-            assert(Options.approx_settings.enabled);
-
-            current_sim = function_approx->Estimate1(space[i],model_inverter,mem_hierarchy);
-            current_sim.simulated = false;
-            current_sim.avg_err_ID = estimator.get_processor_ID(model_inverter);
-
-        }
-        */
-
-		simulations.push_back(current_sim);
-
-
-
-		// -------------------------------------------------------------------
-		//  when doing simulation some interesting info can be optionally saved
-		if (do_simulation)
-		{
-			if (Options.save_spaces)
-			{
-				n_simulate_space_call++;
-				if (get_sim_counter()==0)
-				{
-					n_simulate_space_call=1;
-					n_exploration_executed++;
-				}
-				// M9_space_EXP_2.12, 12th explorated space of 2nd exploration algorithm
-				char name[40];
-				sprintf(name,"_simulatedspace_%d",n_simulate_space_call);
-				string filename = current_algo+"_"+string(name);
-				save_configurations(space,filename);
-			}
-
-			if (Options.save_estimation) // detailed and verbose estimator report
-			{
-				char temp[10];
-				string filename= current_algo+"_"+"."+string(temp)+".est";
-				save_estimation_file(dyn_stats,estimate, filename);	//db
-			}
-
-			if (Options.save_objectives_details) //
-			{
-				string filename= current_algo+"_"+".details";
-				save_objectives_details(dyn_stats,current_sim.config,filename);
-			}
-			// -------------------------------------------------------------------
-		}
+	if (Options.save_objectives_details) //
+	{
+		string filename= current_algo+"_"+".details";
+		save_objectives_details(dyn_stats,current_sim.config,filename);
+	}
+	// -------------------------------------------------------------------
 
 	write_to_log(myid,logfile,"Finished simulate_loop (space size: "+to_string(space.size())+")");
 	return simulations;

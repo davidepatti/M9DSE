@@ -22,10 +22,8 @@ public:
 
 	void set_save_matlog(bool do_save_log);
 
-	void set_environment(const string& path);
-
 	//db
-	void execute_sim(const string &path);	//db
+	void execute_sim();	//db
 
 	void save_model_config(const ModelInverter &, const string &path) const;
 	void load_model_config(ModelInverter *p, const string &filename) const;

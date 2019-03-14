@@ -43,7 +43,7 @@ public:
 
     void start_SAP();
     void start_PBSA();
-    void start_RAND(int n);
+    void start_RAND(int random_size);
     void start_GA(const GA_parameters& parameters);
     void start_EXHA();
     void test(); // for testing only

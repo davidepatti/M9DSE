@@ -156,3 +156,5 @@ set(f1,'Position',get(0,'ScreenSize'));
 error_HL = [error_VgsH error_VdsH error_IdH error_VgsL error_VdsL error_IdL ]
 
 save("error_HL.txt","error_HL","-ascii");
+
+disp("CIAO HO FINITO");

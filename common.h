@@ -143,7 +143,7 @@ struct Configuration
 	double L_Lwire; // % Riferimento Q3D 10.95e-9;   % Valore modificabile
 
 	bool is_feasible(); // mau
-	string get_header() const;
+	string get_string() const;
 	string get_executable_dir() const;
 
 };
