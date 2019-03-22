@@ -188,8 +188,9 @@ void Explorer::GA_evaluate(population* pop)
         sim.config = conf;
 
         if(!conf.is_feasible()){
+            assert(false);
             write_to_log(myrank,logfile,"WARNING: GA configuration " + to_string(index) + " not feasible");
-            sim.avg_err_VDS = BIG_CYCLES;
+            sim.avg_err_VDS = BIG_VDS;
             sim.avg_err_VGS = BIG_VGS;
             sim.avg_err_ID = BIG_ID;
             vsim[index] = sim;

@@ -414,12 +414,13 @@ vector<Simulation> Explorer::get_pareto(const vector<Simulation>& simulations)
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return get_pareto3d(simulations);
 
+    if (n_obj==3) assert(false);
+
     if ( (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return get_pareto_VDSVGS(simulations);
 
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVDS) )
         return get_pareto_IDVDS(simulations);
-    assert(false);
 }
 ////////////////////////////////////////////////////////////////////////////
 vector<Simulation> Explorer::get_pareto_VDSVGS(const vector<Simulation> &simulations)
@@ -493,6 +494,8 @@ vector<Simulation> Explorer::get_pareto_IDVGS(const vector<Simulation> &simulati
 vector<Simulation> Explorer::get_pareto3d(const vector<Simulation>& simulations)
 {
     vector<Simulation> pareto_set;
+
+    assert(n_obj==3);
 
     for (int i=0; i<simulations.size(); i++)
     {

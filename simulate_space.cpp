@@ -38,8 +38,6 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
         matlabInterface->save_model_config(model_inverter,matlab_params_file);
         matlabInterface->execute_sim(); //db
 
-        cout << "CIAOOOO" << endl;
-
 		dyn_stats = matlabInterface->get_dynamic_stats();
 
 		estimate = estimator.get_estimate(dyn_stats);

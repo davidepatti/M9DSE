@@ -22,9 +22,9 @@
 
 #define N_PARAMS 14
 
-#define BIG_CYCLES      1
-#define BIG_VGS      1
-#define BIG_ID        1
+#define BIG_VDS      100
+#define BIG_VGS      100
+#define BIG_ID        100
 
 #define N_OBJ 3
 

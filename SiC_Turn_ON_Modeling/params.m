@@ -3,20 +3,20 @@
 %% Induttanze 
 % Induttanze parassite di bonding interne al package 
 
-L_d_int=1.55e-10
-L_s_int=4.71e-09
-L_g_int=8.76e-09% Induttanze parassite dei pin esterne al package (supponiamo che G e S siano uguali)
+L_d_int=3.8e-10
+L_s_int=3e-09
+L_g_int=2e-09% Induttanze parassite dei pin esterne al package (supponiamo che G e S siano uguali)
 
-L_d_pin=-4.85e-09
-L_s_pin=4.99e-09
-L_g_pin=-2.99e-09% Induttanze parassite del PCB 
+L_d_pin=3e-09
+L_s_pin=3e-09
+L_g_pin=3e-09% Induttanze parassite del PCB 
 
-L_dH_ext=1.63e-08
-L_sH_ext=1.25e-08
-L_gH_ext=1.05e-08
-L_dL_ext=1.81e-08
-L_sL_ext=6.9e-08
-L_gL_ext=9e-09% Induttanze parassite dei cavi per i collegamenti di Kelvin-Source 
+L_dH_ext=5e-09
+L_sH_ext=6e-09
+L_gH_ext=6e-09
+L_dL_ext=5e-09
+L_sL_ext=6e-09
+L_gL_ext=6e-09% Induttanze parassite dei cavi per i collegamenti di Kelvin-Source 
 
-L_Hwire=-1.73e-09
-L_Lwire=-1.73e-09
+L_Hwire=2.5e-09
+L_Lwire=2.5e-09
