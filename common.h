@@ -26,6 +26,8 @@
 #define BIG_VGS      1
 #define BIG_ID        1
 
+#define N_OBJ 3
+
 
 using namespace std;
 
@@ -215,10 +217,11 @@ public:
 		t1.config.L_s_pin+ t1.config.L_g_pin+ t1.config.L_dH_ext + t1.config.L_sH_ext + t1.config.L_gH_ext +
 		t1.config.L_dL_ext + t1.config.L_sL_ext + t1.config.L_gL_ext + t1.config.L_Hwire + t1.config.L_Lwire);
 
-		assert(false);
-		int some_int = something * 10e9;
+		unsigned int some_int = something * 10e9;
 
-		return (  some_int% vhash.size() );
+		unsigned int hsize =  vhash.size();
+		unsigned int  index = some_int % hsize;
+		return index;
 	}
 };
 

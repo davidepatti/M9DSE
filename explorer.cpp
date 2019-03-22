@@ -598,7 +598,7 @@ void Explorer::save_objectives_details(const Dynamic_stats& dyn,const Configurat
 void Explorer::save_stats(const Exploration_stats& stats,const string& file)
 {
     FILE * fp;
-    string file_path = get_base_dir()+"/matlab-workspace/M9-explorer/"+file;
+    string file_path = getenv(BASE_DIR)+string(M9DSE_PATH)+file;
 
     fp = fopen(file_path.c_str(),"w");
 
@@ -627,9 +627,7 @@ void Explorer::prepare_explorer( const Configuration& config)
 ////////////////////////////////////////////////////////////////////////////
 void Explorer::save_estimation_file(const Dynamic_stats &dynamic_stats, const Estimate &estimate, string &filename) const
 {
-    string file_path;
-    file_path = get_base_dir()+"/matlab-workspace/M9-explorer/";
-    file_path += filename;
+    string file_path =  getenv(BASE_DIR)+string(M9DSE_PATH)+ filename;
 
     std::ofstream output_file(file_path.c_str());
 
@@ -1048,23 +1046,46 @@ void Explorer::reset_sim_counter()
 vector<pair<int,int> > Explorer::getParametersNumber()
 {
 
-    assert(false);
     vector<pair<int,int> > v;
 
-    /* TODO M9DSE
-    v.push_back(pair<int,int>(1, model_inverter.integer_units.get_size()) );
-     */
+    v.push_back(pair<int,int>(1,model_inverter.L_d_int.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_s_int.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_g_int.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_d_pin.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_s_pin.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_g_pin.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_dH_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_sH_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_gH_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_dL_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_sL_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_gL_ext.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_Hwire.get_size()));
+    v.push_back(pair<int,int>(1,model_inverter.L_Lwire.get_size()));
+
+
+    return v;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 vector<pair<int,int> > Explorer::getParameterRanges()
 {
-    assert(false);
     vector<pair<int,int> > v;
 
-    /* TODO M9DSE
-    v.push_back(pair<int,int>(model_inverter.integer_units.get_first(), model_inverter.integer_units.get_last()));
-     */
+    v.push_back(pair<int,int>(model_inverter.L_d_int.get_first(), model_inverter.L_d_int.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_s_int.get_first(), model_inverter.L_s_int.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_g_int.get_first(), model_inverter.L_g_int.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_d_pin.get_first(), model_inverter.L_d_pin.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_s_pin.get_first(), model_inverter.L_s_pin.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_g_pin.get_first(), model_inverter.L_g_pin.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_dH_ext.get_first(), model_inverter.L_dH_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_sH_ext.get_first(), model_inverter.L_sH_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_gH_ext.get_first(), model_inverter.L_gH_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_dL_ext.get_first(), model_inverter.L_dL_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_sL_ext.get_first(), model_inverter.L_sL_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_gL_ext.get_first(), model_inverter.L_gL_ext.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_Hwire.get_first(), model_inverter.L_Hwire.get_last()));
+    v.push_back(pair<int,int>(model_inverter.L_Lwire.get_first(), model_inverter.L_Lwire.get_last()));
     return v;
 }
 
@@ -1261,7 +1282,8 @@ void Explorer::init_approximation()
         if (function_approx != NULL) free(function_approx);
         function_approx = new CFuzzyFunctionApproximation();
         function_approx->FuzzySetsInit(getParametersNumber());
-        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,n_objectives());
+        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,
+                              getNumObjectives());
     }
     else if (Options.approx_settings.enabled==2)
     {
@@ -1276,7 +1298,7 @@ void Explorer::init_approximation()
         cout << "\nArtificial Neural Network Approximation Enabled\n";
         if (function_approx != NULL) free(function_approx);
         function_approx = new CAnnFunctionApproximation();
-        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,n_objectives());
+        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,getNumObjectives());
         */
     }
 

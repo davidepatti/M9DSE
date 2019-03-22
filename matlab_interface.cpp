@@ -26,9 +26,10 @@ void MatlabInterface::execute_sim() //db
 
 	string script = "cd "+string(getenv(BASE_DIR))+string(MATLAB_WORKSPACE)+", Simula, quit";
 	string command = string(MATLAB_BIN)+" -nosplash -nodesktop -r \""+script+"\"";
+
 	// /matlab -nosplash -nodesktop -r "Simula, quit"
 
-	//string command = "nc 127.0.0.1 30000 && sleep 3";
+	//string command = "nc 127.0.0.1 30000";
 
 	cout << M9DSE_TAG << "executing: " << command;
 	system(command.c_str());

@@ -127,7 +127,7 @@ public:
     vector<pair<int,int> > getParameterRanges();
     vector<pair<int,int> > getParametersNumber();
 
-    int n_objectives() {return n_obj;}
+    int getNumObjectives() {return n_obj;}
 
 private:
 

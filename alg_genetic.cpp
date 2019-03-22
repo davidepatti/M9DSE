@@ -46,7 +46,7 @@ void Explorer::start_GA(const GA_parameters& parameters)
     init_GA(); // call it before creating anything GA related
 
     int pop_size = parameters.population_size;
-    common* comm = new common(pop_size, pop_size, pop_size, n_obj); // (alpha, mu, lambda, dim)
+    common* comm = new common(pop_size, pop_size, pop_size, N_OBJ); // (alpha, mu, lambda, dim)
     variator* var = new variator(parameters.pcrossover, parameters.pmutation, CHROMOSOME_DIM, comm); // (xover_p, mutation_p, chromo_dim)
     selector* sel = new selector(DEF_TOURNAMENT, comm); // (tournament)
     int generation = 0;
@@ -151,8 +151,6 @@ void Explorer::init_GA()
 Configuration Explorer::ind2conf(const individual& ind){
     Configuration conf;
 
-    assert(false);
-    // TODO m9fix
     conf.L_d_int= ind.phenotype(0);
     conf.L_s_int= ind.phenotype(1);
     conf.L_g_int= ind.phenotype(2);
