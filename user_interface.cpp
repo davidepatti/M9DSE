@@ -57,7 +57,7 @@ void UserInterface::start_exploration_message()
 {
 	cout << "\n Ok, you are ready to start exploration.";
 	cout << "\n Results will be saved in the directory:\n";
-	cout << base_path + "/matlab-workspace/M9-explorer";
+	cout << getenv(BASE_DIR)+string(M9DSE_PATH);
 }
 
 
