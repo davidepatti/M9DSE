@@ -59,12 +59,13 @@ Explorer::Explorer(MatlabInterface * pInterface)
     Options.objective_avg_errVDS = true;
     Options.objective_avg_errVGS = true;
 
+    this->n_obj =3;
+
     Options.save_spaces = false;
     Options.save_estimation = false;
 
     Options.save_objectives_details = false;
     force_simulation = false;
-    function_approx = NULL;
 
     string space_file = getenv(BASE_DIR)+string(M9DSE_PATH)+string(CONFIG_SPACE_FILE);
 
@@ -80,20 +81,6 @@ Explorer::~Explorer()
     write_to_log(get_mpi_rank(),logfile,"Destroying explorer class");
 }
 
-
-//********************************************************************
-void Explorer::set_options(const struct UserSettings& user_settings)
-{
-    Options = user_settings;
-
-    // Number of objectives
-    n_obj = 0;
-
-    if (Options.objective_avg_errVGS) n_obj++;
-    if (Options.objective_avg_errVDS) n_obj++;
-    if (Options.objective_avg_errID) n_obj++;
-
-}
 
 ////////////////////////////////////////////////////////////////////////////
 // The following  are utility functions used by exploring functions
@@ -233,12 +220,12 @@ void Explorer::start_EXHA()
     vector<Simulation> pareto_set = get_pareto(simulations);
 
     string filename = "EXHA";
-    save_simulations(simulations,filename+".exp");
-    save_simulations(pareto_set,filename+".pareto.exp");
+    saveSimulations(simulations, filename + ".exp");
+    saveSimulations(pareto_set, filename + ".pareto.exp");
 
     stats.end_time = time(NULL);
     stats.n_sim = get_sim_counter();
-    save_stats(stats,filename+".stat");
+    saveStats(stats, filename + ".stat");
 }
 
 
@@ -412,7 +399,7 @@ bool isDominated(Simulation sim, const vector<Simulation>& simulations)
 vector<Simulation> Explorer::get_pareto(const vector<Simulation>& simulations)
 {
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
-        return get_pareto3d(simulations);
+        return getPareto3d(simulations);
 
     if (n_obj==3) assert(false);
 
@@ -467,31 +454,9 @@ vector<Simulation> Explorer::get_pareto_IDVDS(const vector<Simulation> &simulati
     }
     return pareto_set;
 }
-////////////////////////////////////////////////////////////////////////////
-vector<Simulation> Explorer::get_pareto_IDVGS(const vector<Simulation> &simulations)
-{
-    double min_ID = 1000000000000000.0;
-
-    vector<Simulation> pareto_set;
-    vector<Simulation> sorted = sort_by_VGS(simulations);
-
-    while (sorted.size()>0)
-    {
-        if (sorted[0].avg_err_ID<=min_ID)
-        {
-            if ( (pareto_set.size()>0) && (pareto_set.back().avg_err_VGS==sorted[0].avg_err_VGS))
-                pareto_set.pop_back();
-
-            min_ID = sorted[0].avg_err_ID;
-            pareto_set.push_back(sorted[0]);
-        }
-        sorted.erase(sorted.begin());
-    }
-    return pareto_set;
-}
 
 ////////////////////////////////////////////////////////////////////////////
-vector<Simulation> Explorer::get_pareto3d(const vector<Simulation>& simulations)
+vector<Simulation> Explorer::getPareto3d(const vector<Simulation> &simulations)
 {
     vector<Simulation> pareto_set;
 
@@ -527,7 +492,7 @@ vector<Simulation> Explorer::get_pareto3d(const vector<Simulation>& simulations)
 
 
 ////////////////////////////////////////////////////////////////////////////
-void Explorer::save_configurations(const vector<Configuration>& space, const string& filename)
+void Explorer::saveConfigurations(const vector<Configuration> &space, const string &filename)
 {
     vector<Simulation> pseudo_sims;
     Simulation pseudo_sim;
@@ -541,10 +506,10 @@ void Explorer::save_configurations(const vector<Configuration>& space, const str
         pseudo_sim.simulated = false;
         pseudo_sims.push_back(pseudo_sim);
     }
-    save_simulations(pseudo_sims,filename);
+    saveSimulations(pseudo_sims, filename);
 }
 ////////////////////////////////////////////////////////////////////////////
-void Explorer::save_simulations(const vector<Simulation>& simulations, const string& filename)
+void Explorer::saveSimulations(const vector<Simulation> &simulations, const string &filename)
 {
     double ID,VGS,VDS;
 
@@ -582,7 +547,7 @@ void Explorer::save_simulations(const vector<Simulation>& simulations, const str
     fclose(fp);
 }
 
-void Explorer::save_objectives_details(const Dynamic_stats& dyn,const Configuration& config, const string filename) const
+void Explorer::saveObjectivesDetails(const Dynamic_stats &dyn, const Configuration &config, const string filename) const
 {
     FILE * fp;
     fp=fopen(filename.c_str(),"a");
@@ -598,7 +563,7 @@ void Explorer::save_objectives_details(const Dynamic_stats& dyn,const Configurat
 }
 
 ////////////////////////////////////////////////////////////////////////////
-void Explorer::save_stats(const Exploration_stats& stats,const string& file)
+void Explorer::saveStats(const Exploration_stats &stats, const string &file)
 {
     FILE * fp;
     string file_path = getenv(BASE_DIR)+string(M9DSE_PATH)+file;
@@ -617,13 +582,6 @@ void Explorer::save_stats(const Exploration_stats& stats,const string& file)
     fprintf(fp,"\n simulation end: %s ",asctime(localtime(&stats.end_time)));
 
     fclose(fp);
-}
-
-/////////////////////////////////////////////////////////////////
-void Explorer::prepare_explorer( const Configuration& config)
-{
-    // Note that this fuction does NOT create any directory, but
-    // simply sets explorer class members according to the app and configuration
 }
 
 
@@ -1272,7 +1230,7 @@ void Explorer::test()
     save_simulations(res,filename+".exp");
     vector<Simulation> pareto_set = get_pareto(res);
 
-    save_simulations(pareto_set,filename+".pareto.exp");
+    saveSimulations(pareto_set,filename+".pareto.exp");
     */
 
 }

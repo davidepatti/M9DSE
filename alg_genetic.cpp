@@ -96,9 +96,9 @@ void Explorer::start_GA(const GA_parameters& parameters)
             sprintf(temp, "_%d", generation);
             stats.end_time = time(NULL);
             stats.n_sim = get_sim_counter();
-            save_stats(stats,file_name+string(temp)+".stat");
-            save_simulations(eud.pareto, file_name+string(temp)+".pareto.exp");
-            save_simulations(eud.history, file_name+".history");
+            saveStats(stats, file_name + string(temp) + ".stat");
+            saveSimulations(eud.pareto, file_name + string(temp) + ".pareto.exp");
+            saveSimulations(eud.history, file_name + ".history");
         }
     }
     var->read_arc();
@@ -107,12 +107,12 @@ void Explorer::start_GA(const GA_parameters& parameters)
 
     var->write_output();
     // save history
-    save_simulations(eud.history, file_name+".history");
+    saveSimulations(eud.history, file_name + ".history");
 
     // save statistics
     stats.end_time = time(NULL);
     stats.n_sim = get_sim_counter();
-    save_stats(stats, file_name+".stat");
+    saveStats(stats, file_name + ".stat");
 }
 
 //********************************************************************

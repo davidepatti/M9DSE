@@ -59,12 +59,12 @@ void Explorer::start_RAND(int random_size)
 	vector<Simulation> rand_sims = simulate_space(random_space);
 	vector<Simulation> pareto_set = get_pareto(rand_sims);
 
-	save_simulations(rand_sims,filename+".exp");
-	save_simulations(pareto_set,filename+".pareto.exp");
+	saveSimulations(rand_sims, filename + ".exp");
+	saveSimulations(pareto_set, filename + ".pareto.exp");
 
 	stats.end_time = time(NULL);
 	stats.n_sim = get_sim_counter();
-	save_stats(stats,filename+".stat");
+	saveStats(stats, filename + ".stat");
 
 	write_to_log(my_ID,logfile,"End of RANDOM simulation");
 }

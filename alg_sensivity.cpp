@@ -104,11 +104,11 @@ void Explorer::start_SAP()
         char temp[10];
         sprintf(temp,"%d_",i);
 
-        save_simulations(ordered_sims,file_name+string(temp)+".exp");
+        saveSimulations(ordered_sims, file_name + string(temp) + ".exp");
     }
     stats.end_time = time(NULL);
     stats.n_sim = get_sim_counter();
-    save_stats(stats,file_name+".stat");
+    saveStats(stats, file_name + ".stat");
 }
 
 // modified version of SAP, sensivity order of parameters is
@@ -253,15 +253,15 @@ void Explorer::start_PBSA()
         char temp[10];
         sprintf(temp,"%d_",i);
         string file_name = "PBSA_stage"+string(temp);
-        save_simulations(pareto_set,file_name+".exp");
+        saveSimulations(pareto_set, file_name + ".exp");
     }
 
     string file_name = "PBSA";
-    save_simulations(pareto_set,file_name+".pareto.exp");
+    saveSimulations(pareto_set, file_name + ".pareto.exp");
 
     stats.end_time = time(NULL);
     stats.n_sim = get_sim_counter();
-    save_stats(stats,file_name+".stat");
+    saveStats(stats, file_name + ".stat");
 }
 // ********************************************************************
 // multiobjective sensivity 

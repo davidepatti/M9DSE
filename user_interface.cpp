@@ -275,13 +275,6 @@ void UserInterface::edit_user_settings()
 		cout << "\n  (5) - save simulated spaces        --> " << status_string(user_settings.save_spaces);
 		cout << "\n  (8) - Save matlab tcc logs       --> " << status_string(user_settings.save_matlog);
 		cout << "\n  (9) - save estimation detail files --> " << status_string(user_settings.save_estimation);
-		cout << "\n (12) - Approximation                --> " << user_settings.approx_settings.enabled;
-		if (user_settings.approx_settings.enabled>0)
-		{
-			cout << " ( " << user_settings.approx_settings.threshold <<
-				 " , " << user_settings.approx_settings.min <<
-				 " - " << user_settings.approx_settings.max << " )";
-		}
 
 		cout << "\n ----------------------------------------------------------";
 		cout << "\n (s) - Save current settings";
@@ -301,32 +294,10 @@ void UserInterface::edit_user_settings()
             matlab_interface->set_save_matlog(user_settings.save_matlog);
 		}
 		if (ch=="9") user_settings.save_estimation = !user_settings.save_estimation;
-		if (ch=="12")
-		{
-			cout << "\n Select Approximation method:";
-			cout << "\n (0) None";
-			cout << "\n (1) Fuzzy System";
-			cout << "\n (2) Artificial Neural Network";
-			cout << "\n select: ";
-			cin >> user_settings.approx_settings.enabled;
-
-			if (user_settings.approx_settings.enabled>0)
-			{
-				cout << "\n Enter % error threshold : ";
-				cin >> user_settings.approx_settings.threshold;
-				cout << "\n Min number of simulations: ";
-				cin >> user_settings.approx_settings.min;
-				cout << "\n Max number of simulations: ";
-				cin >> user_settings.approx_settings.max;
-			}
-
-		}
-
 		if (ch=="s") save_settings_wrapper();
 
 	} while(ch!="q");
 
-	my_explorer->set_options(user_settings);
 }
 
 inline string UserInterface::status_string(bool b)

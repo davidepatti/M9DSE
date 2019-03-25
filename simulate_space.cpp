@@ -63,7 +63,7 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 		char name[40];
 		sprintf(name,"_simulatedspace_%d",n_simulate_space_call);
 		string filename = current_algo+"_"+string(name);
-		save_configurations(space,filename);
+		saveConfigurations(space, filename);
 	}
 
 	if (Options.save_estimation) // detailed and verbose estimator report
@@ -76,7 +76,7 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 	if (Options.save_objectives_details) //
 	{
 		string filename= current_algo+"_"+".details";
-		save_objectives_details(dyn_stats,current_sim.config,filename);
+		saveObjectivesDetails(dyn_stats, current_sim.config, filename);
 	}
 	// -------------------------------------------------------------------
 

@@ -34,9 +34,6 @@ public:
     Explorer(MatlabInterface * pInterface);
     ~Explorer();
 
-    // Functions to modify explorer options
-    void set_options(const struct UserSettings& user_settings);
-
     string get_base_dir() const;
 
     // Exploration algorithms
@@ -88,10 +85,9 @@ public:
     // function to manipulate Simulations
 
     vector<Simulation> get_pareto(const vector<Simulation>& simulations);
-    vector<Simulation> get_pareto3d(const vector<Simulation>& simulations);
+    vector<Simulation> getPareto3d(const vector<Simulation> &simulations);
     vector<Simulation> get_pareto_VDSVGS(const vector<Simulation> &simulations);
     vector<Simulation> get_pareto_IDVDS(const vector<Simulation> &simulations);
-    vector<Simulation> get_pareto_IDVGS(const vector<Simulation> &simulations);
 
     void remove_dominated_simulations(vector<Simulation>& sims);
     vector<Simulation> normalize(const vector<Simulation>& sims);
@@ -106,11 +102,11 @@ public:
     double distance(const Simulation& s1,const Simulation& s2);
 
     void append_simulations(vector<Simulation>& dest,const vector<Simulation>& new_sims);
-    void save_simulations(const vector<Simulation>& simulations,const string& filename);
-    void save_configurations(const vector<Configuration>& space,const string& filename);
-    void save_stats(const Exploration_stats& stats,const string& filename);
+    void saveSimulations(const vector<Simulation> &simulations, const string &filename);
+    void saveConfigurations(const vector<Configuration> &space, const string &filename);
+    void saveStats(const Exploration_stats &stats, const string &file);
     void save_estimation_file(const Dynamic_stats& ,const Estimate& ,string& filename) const;
-    void save_objectives_details(const Dynamic_stats& dyn,const Configuration& conf, const string filename ) const;
+    void saveObjectivesDetails(const Dynamic_stats &dyn, const Configuration &config, const string filename) const;
 
     int get_sim_counter() const;
 
@@ -131,7 +127,6 @@ public:
 
 private:
 
-    void prepare_explorer(const Configuration &config);
     vector<Simulation> simulate_loop(const vector<Configuration>& space);
 
 
