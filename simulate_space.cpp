@@ -123,6 +123,7 @@ vector<Simulation> Explorer::simulate_space(const vector<Configuration>& space)
 	}
 
 #ifdef M9DSE_MPI
+	assert(false);
 	counter2 = to_sim[0];
 
     for (int p = 1; p < mysize; p++) {

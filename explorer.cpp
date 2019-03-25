@@ -528,21 +528,21 @@ void Explorer::saveSimulations(const vector<Simulation> &simulations, const stri
 
     fprintf(fp,"\n%% ----------------------------------------------");
     // currently, avg_err_VGS and power are mutually exclusive objectives
-    title+="ID\tVGS\tVDS\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
+    title+="VGS\tVDS\tID\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
 
     fprintf(fp,"\n%% %s",title.c_str());
     fprintf(fp,"\n%% ----------------------------------------------");
 
     for (unsigned int i =0;i<simulations.size();i++)
     {
-        ID = simulations[i].avg_err_ID;
         VGS = simulations[i].avg_err_VGS;
         VDS = simulations[i].avg_err_VDS;
+        ID = simulations[i].avg_err_ID;
 
         string conf_string = simulations[i].config.get_string();
 
 
-        fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%s",ID,VGS,VDS,conf_string.c_str());
+        fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%s",VGS,VDS,ID,conf_string.c_str());
     }
     fclose(fp);
 }
@@ -556,8 +556,8 @@ void Explorer::saveObjectivesDetails(const Dynamic_stats &dyn, const Configurati
 
 
     //
-    fprintf(fp,"\n %g %g %g %g %g %g %s", dyn.err_VGS_L, dyn.err_ID_L,
-            dyn.err_VDS_L, dyn.err_VGS_H, dyn.err_ID_H, dyn.err_VDS_H, c.c_str());
+    fprintf(fp,"\n %g %g %g %g %g %g %s", dyn.err_VGS_L, dyn.err_VDS_L,
+            dyn.err_ID_L, dyn.err_VGS_H, dyn.err_VDS_H, dyn.err_ID_H, c.c_str());
 
     fclose(fp);
 }
