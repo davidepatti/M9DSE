@@ -162,8 +162,6 @@ private:
 
 struct Dynamic_stats
 {
-	bool valid; // if false, something weird happened while compiling/simulating
-
 	double err_VGS_L, err_ID_L, err_VDS_L;
 	double err_VGS_H, err_ID_H,err_VDS_H;
 
