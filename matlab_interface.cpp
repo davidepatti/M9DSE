@@ -4,6 +4,7 @@
 #include "common.h"
 #include <cstdio>
 #include <sys/stat.h>
+#include <math.h>
 
 MatlabInterface::MatlabInterface()
 {
@@ -40,21 +41,36 @@ Dynamic_stats MatlabInterface::get_dynamic_stats()
 {
 	Dynamic_stats stats;
 
-    FILE * fp;
-    string filename = getenv(BASE_DIR)+string(MATLAB_WORKSPACE)+string(MATLAB_OUT_FILE);
-    fp = fopen(filename.c_str(),"r");
+	FILE * fp;
+	string filename = getenv(BASE_DIR)+string(MATLAB_WORKSPACE)+string(MATLAB_OUT_FILE);
+	fp = fopen(filename.c_str(),"r");
 
 
-    if (fp!=NULL)
-	{
-    	fscanf(fp,"%lf %lf %lf %lf %lf %lf",&stats.err_VGS_H,&stats.err_VDS_H,&stats.err_ID_H,
-    			                            &stats.err_VGS_L,&stats.err_VDS_L,&stats.err_ID_L);
-    	fclose(fp);
+	if (fp!=NULL) {
+		fscanf(fp,"%lf %lf %lf %lf %lf %lf",&stats.err_VGS_H,&stats.err_VDS_H,&stats.err_ID_H,
+			   &stats.err_VGS_L,&stats.err_VDS_L,&stats.err_ID_L);
+		fclose(fp);
+
+		if (isnan(stats.err_VGS_H)
+			|| isnan(stats.err_VDS_H)
+			|| isnan(stats.err_ID_H)
+			|| isnan(stats.err_VGS_L)
+			|| isnan(stats.err_VDS_L)
+			|| isnan(stats.err_ID_L))
+		{
+			write_to_log(get_mpi_rank(),string(getenv(BASE_DIR))+string(M9DSE_LOG_FILE),"WARNING: discarding conf because NaN occurrence");
+			stats.err_VGS_H = BIG_VGS;
+			stats.err_VDS_H = BIG_VDS;
+			stats.err_ID_H = BIG_ID;
+			stats.err_VGS_L = BIG_VGS;
+			stats.err_VDS_L = BIG_VDS;
+			stats.err_ID_L  = BIG_ID;
+		}
+
 	}
-    else
-	{
-    	cout << "Cannot open " << filename;
-    	exit(-1);
+	else {
+		cout << "Cannot open " << filename;
+		exit(-1);
 	}
 
 	return stats;
