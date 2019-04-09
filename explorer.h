@@ -86,6 +86,7 @@ public:
 
     vector<Simulation> get_pareto(const vector<Simulation>& simulations);
     vector<Simulation> getPareto3d(const vector<Simulation> &simulations);
+    vector<Simulation> getPareto6d(const vector<Simulation> &simulations);
     vector<Simulation> get_pareto_VDSVGS(const vector<Simulation> &simulations);
     vector<Simulation> get_pareto_IDVDS(const vector<Simulation> &simulations);
 

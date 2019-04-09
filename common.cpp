@@ -45,39 +45,6 @@ string Configuration::get_executable_dir() const
 
 
 
-void Simulation::add_simulation(const Simulation& other)
-{
-    if(avg_err_VGS_v.size() == 0 &&  avg_err_ID_v.size() == 0 && avg_err_VDS_v.size() == 0){ // single to multi-valued transform
-        avg_err_VGS_v.push_back(avg_err_VGS);
-        avg_err_ID_v.push_back(avg_err_ID);
-        avg_err_VDS_v.push_back(avg_err_VDS);
-    }
-    if(other.avg_err_VGS_v.size()>0 &&  other.avg_err_ID_v.size()>0 && avg_err_VDS_v.size()>0) { // multiple valued simulation
-        avg_err_VGS_v.insert(avg_err_VGS_v.end(), other.avg_err_VGS_v.begin(), other.avg_err_VGS_v.end());
-        avg_err_ID_v.insert(avg_err_ID_v.end(), other.avg_err_ID_v.begin(), other.avg_err_ID_v.end());
-        avg_err_VDS_v.insert(avg_err_VDS_v.end(), other.avg_err_VDS_v.begin(), other.avg_err_VDS_v.end());
-    } else { // single valued simulation
-        avg_err_VGS_v.push_back(other.avg_err_VGS);
-        avg_err_ID_v.push_back(other.avg_err_ID);
-        avg_err_VDS_v.push_back(other.avg_err_VDS);
-    }
-    // update mean values
-    vector<double>::iterator it;
-    double sum = 0;
-    for(it = avg_err_VGS_v.begin(); it != avg_err_VGS_v.end(); it++)
-        sum += *it;
-    //cout<<"\n VGS: "<< avg_err_VGS <<" sum/size: "<< sum << "/" << avg_err_VGS_v.size() << endl;
-    avg_err_VGS = sum / avg_err_VGS_v.size();
-    sum = 0;
-    for(it = avg_err_ID_v.begin(); it != avg_err_ID_v.end(); it++)
-        sum += *it;
-    avg_err_ID = sum / avg_err_ID_v.size();
-    sum = 0;
-    for(it = avg_err_VDS_v.begin(); it != avg_err_VDS_v.end(); it++)
-        sum += *it;
-    avg_err_VDS = sum / avg_err_VDS_v.size();
-}
-
 
 // File access utilities - mainly to improve readability
 void go_until(const string& dest,ifstream& ifs)

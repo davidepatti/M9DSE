@@ -10,6 +10,7 @@ Estimator::~Estimator(){
 
 Estimate Estimator::get_estimate(const Dynamic_stats &dyn_stats)
 {
+    assert(N_OBJ==3);
     string tmp;
     Estimate estimate;
 

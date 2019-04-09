@@ -54,12 +54,23 @@ Explorer::Explorer(MatlabInterface * pInterface)
     // when simulation is started these values will be calculated
     // to be more realistic
 
+    this->n_obj =N_OBJ;
     // by default objectives include avg_err_VDS and average power
-    Options.objective_avg_errID = true;
-    Options.objective_avg_errVDS = true;
-    Options.objective_avg_errVGS = true;
+    if (n_obj==3){
+        Options.objective_avg_errID = true;
+        Options.objective_avg_errVDS = true;
+        Options.objective_avg_errVGS = true;
+    }
+    else if (n_obj==6){
+        Options.objective_errID_H = true;
+        Options.objective_errVDS_H = true;
+        Options.objective_errVGS_H = true;
+        Options.objective_errID_L = true;
+        Options.objective_errVDS_L = true;
+        Options.objective_errVGS_L = true;
+    } else
+        assert(false);
 
-    this->n_obj =3;
 
     Options.save_spaces = false;
     Options.save_estimation = false;
@@ -188,9 +199,14 @@ double Explorer::distance(const Simulation& s1, const Simulation& s2)
     if ( (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return sqrt(pow(s1.avg_err_VGS-s2.avg_err_VGS,2) + pow(double(s1.avg_err_VDS-s2.avg_err_VDS),2) );
 
-
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVDS) )
         return sqrt(pow(s1.avg_err_ID-s2.avg_err_ID,2) + pow(double(s1.avg_err_VDS-s2.avg_err_VDS),2) );
+
+    assert(n_obj==6);
+    return sqrt(pow(s1.err_ID_H-s2.err_ID_H,2)+ pow(s1.err_VGS_H-s2.err_VGS_H,2) + pow((s1.err_VDS_H-s2.err_VDS_H),2) +
+                pow(s1.err_ID_L-s2.err_ID_L,2)+ pow(s1.err_VGS_L-s2.err_VGS_L,2)+ pow((s1.err_VDS_L-s2.err_VDS_L),2));
+
+
 
     cout << "\n\n The selected combination of objectives is not supported from";
     cout << "\n get_distance(...) function in explorer.cpp ";
@@ -233,6 +249,7 @@ void Explorer::start_EXHA()
 
 vector<Simulation> Explorer::normalize(const vector<Simulation>& sims)
 {
+    assert(false);
     vector<Simulation> sorted1 = sort_by_VDS(sims);
     vector<Simulation> sorted2 = sort_by_VGS(sims);
     vector<Simulation> sorted3 = sort_by_ID(sims);
@@ -384,6 +401,7 @@ vector<Simulation> Explorer::sort_by_ID(vector<Simulation> sims)
 /////////////////////////////////////////////////////////////////////////////
 bool isDominated(Simulation sim, const vector<Simulation>& simulations)
 {
+    assert(false);
 
     for(int i=0;i<simulations.size();++i)
     {
@@ -401,13 +419,16 @@ vector<Simulation> Explorer::get_pareto(const vector<Simulation>& simulations)
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return getPareto3d(simulations);
 
-    if (n_obj==3) assert(false);
-
     if ( (Options.objective_avg_errVGS) && (Options.objective_avg_errVDS) )
         return get_pareto_VDSVGS(simulations);
 
     if ( (Options.objective_avg_errID) && (Options.objective_avg_errVDS) )
         return get_pareto_IDVDS(simulations);
+
+    assert(n_obj==6);
+
+    return getPareto6d(simulations);
+
 }
 ////////////////////////////////////////////////////////////////////////////
 vector<Simulation> Explorer::get_pareto_VDSVGS(const vector<Simulation> &simulations)
@@ -452,6 +473,45 @@ vector<Simulation> Explorer::get_pareto_IDVDS(const vector<Simulation> &simulati
         }
         sorted.erase(sorted.begin());
     }
+    return pareto_set;
+}
+////////////////////////////////////////////////////////////////////////////
+vector<Simulation> Explorer::getPareto6d(const vector<Simulation> &simulations)
+{
+    vector<Simulation> pareto_set;
+
+    assert(n_obj==6);
+
+    for (int i=0; i<simulations.size(); i++)
+    {
+        bool dominated = false;
+
+        for (int j=0; j<simulations.size() && !dominated; j++)
+
+            // if it is dominated...
+            if (   (simulations[j].err_VGS_H <= simulations[i].err_VGS_H &&
+                    simulations[j].err_ID_H <= simulations[i].err_ID_H &&
+                    simulations[j].err_VDS_H <= simulations[i].err_VDS_H &&
+                    simulations[j].err_VGS_L <= simulations[i].err_VGS_L &&
+                    simulations[j].err_ID_L <= simulations[i].err_ID_L &&
+                    simulations[j].err_VDS_L <= simulations[i].err_VDS_L)
+
+                   &&
+                   // ...but not from an identical sim
+                   (simulations[j].err_VGS_H != simulations[i].err_VGS_H &&
+                    simulations[j].err_ID_H != simulations[i].err_ID_H &&
+                    simulations[j].err_VDS_H != simulations[i].err_VDS_H &&
+                    simulations[j].err_VGS_L != simulations[i].err_VGS_L &&
+                    simulations[j].err_ID_L != simulations[i].err_ID_L &&
+                    simulations[j].err_VDS_L != simulations[i].err_VDS_L))
+
+                dominated = true;
+
+        // avoid repeated pareto configs
+        if ( (!dominated) && (simulation_present(simulations[i],pareto_set) == -1) )
+            pareto_set.push_back(simulations[i]);
+    }
+
     return pareto_set;
 }
 
@@ -512,6 +572,8 @@ void Explorer::saveConfigurations(const vector<Configuration> &space, const stri
 void Explorer::saveSimulations(const vector<Simulation> &simulations, const string &filename)
 {
     double ID,VGS,VDS;
+    double ID_H,VGS_H,VDS_H;
+    double ID_L,VGS_L,VDS_L;
 
     FILE * fp;
 
@@ -528,21 +590,35 @@ void Explorer::saveSimulations(const vector<Simulation> &simulations, const stri
 
     fprintf(fp,"\n%% ----------------------------------------------");
     // currently, avg_err_VGS and power are mutually exclusive objectives
-    title+="VGS\tVDS\tID\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
+    if (n_obj==3)
+        title+="VGS\tVDS\tID\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
+    else if (n_obj==6)
+        title+="VGS_H\tVGS_L\tVDS_H\tVDS_L\tID_H\tID_L\tL_d_int\tL_s_int\tL_g_int\tL_d_pin\tL_s_pin\tL_g_pin\tL_dH_ext\tL_sH_ext\tL_gH_ext\tL_dL_ext\tL_sL_ext\tL_gL_ext\tL_Hwire\tL_Lwire";
+    else assert(false);
 
     fprintf(fp,"\n%% %s",title.c_str());
     fprintf(fp,"\n%% ----------------------------------------------");
 
     for (unsigned int i =0;i<simulations.size();i++)
     {
-        VGS = simulations[i].avg_err_VGS;
-        VDS = simulations[i].avg_err_VDS;
-        ID = simulations[i].avg_err_ID;
-
         string conf_string = simulations[i].config.get_string();
 
-
-        fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%s",VGS,VDS,ID,conf_string.c_str());
+        if (n_obj==3){
+            VGS = simulations[i].avg_err_VGS;
+            VDS = simulations[i].avg_err_VDS;
+            ID = simulations[i].avg_err_ID;
+            fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%s",VGS,VDS,ID,conf_string.c_str());
+        }
+        else if (n_obj==6){
+            VGS_H = simulations[i].err_VGS_H;
+            VDS_H = simulations[i].err_VDS_H;
+            ID_H = simulations[i].err_ID_H;
+            VGS_L = simulations[i].err_VGS_L;
+            VDS_L = simulations[i].err_VDS_L;
+            ID_L = simulations[i].err_ID_L;
+            fprintf(fp,"\n%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%.9f\t%s",VGS_H,VGS_L,VDS_H,VDS_L,ID_H,ID_L,conf_string.c_str());
+        }
+        else assert(false);
     }
     fclose(fp);
 }
@@ -553,8 +629,6 @@ void Explorer::saveObjectivesDetails(const Dynamic_stats &dyn, const Configurati
     fp=fopen(filename.c_str(),"a");
 
     string c = config.get_string();
-
-
     //
     fprintf(fp,"\n %g %g %g %g %g %g %s", dyn.err_VGS_L, dyn.err_VDS_L,
             dyn.err_ID_L, dyn.err_VGS_H, dyn.err_VDS_H, dyn.err_ID_H, c.c_str());
@@ -928,12 +1002,24 @@ int Explorer::simulation_present(const Simulation& sim,const vector<Simulation>&
 
     for (int i=0;i<simulations.size();++i)
     {
-        if (
-                (simulations[i].avg_err_ID == sim.avg_err_ID) &&
-                (simulations[i].avg_err_VGS == sim.avg_err_VGS) &&
-                (simulations[i].avg_err_VDS == sim.avg_err_VDS)
-                )
-            return (i);
+        if (n_obj==3){
+            if ( (simulations[i].avg_err_ID == sim.avg_err_ID) &&
+                 (simulations[i].avg_err_VGS == sim.avg_err_VGS) &&
+                 (simulations[i].avg_err_VDS == sim.avg_err_VDS) )
+                return (i);
+        }
+        else if (n_obj==6){
+            if (
+                    (simulations[i].err_ID_H == sim.err_ID_H) &&
+                    (simulations[i].err_ID_L == sim.err_ID_L) &&
+                    (simulations[i].err_VGS_H == sim.err_VGS_H) &&
+                    (simulations[i].err_VGS_L == sim.err_VGS_L) &&
+                    (simulations[i].err_VDS_H == sim.err_VDS_H) &&
+                    (simulations[i].err_VDS_L == sim.err_VDS_L) )
+                return (i);
+        }
+        else
+            assert(false);
     }
     return (-1);
 }
@@ -1235,32 +1321,3 @@ void Explorer::test()
 
 }
 
-void Explorer::init_approximation()
-{
-    if (Options.approx_settings.enabled==1)
-    {
-        cout << "\nFuzzy Approximation Enabled\n";
-        if (function_approx != NULL) free(function_approx);
-        function_approx = new CFuzzyFunctionApproximation();
-        function_approx->FuzzySetsInit(getParametersNumber());
-        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,
-                              getNumObjectives());
-    }
-    else if (Options.approx_settings.enabled==2)
-    {
-
-        cout << "\nArtificial Neural Network Approximation is not available in this release\n";
-        cout << "\nFuzzy Approximation will be enabled instead\n";
-        Options.approx_settings.enabled = 1;
-        init_approximation();
-
-        /*
-
-        cout << "\nArtificial Neural Network Approximation Enabled\n";
-        if (function_approx != NULL) free(function_approx);
-        function_approx = new CAnnFunctionApproximation();
-        function_approx->Init(Options.approx_settings.threshold,Options.approx_settings.min, Options.approx_settings.max,getNumObjectives());
-        */
-    }
-
-}

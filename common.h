@@ -26,7 +26,7 @@
 #define BIG_VGS      100
 #define BIG_ID        100
 
-#define N_OBJ 3
+#define N_OBJ 6
 
 
 using namespace std;
@@ -60,16 +60,19 @@ struct UserSettings
 	bool objective_avg_errID;
 	bool objective_avg_errVDS;
 	bool objective_avg_errVGS;
+
+	bool objective_errID_H;
+	bool objective_errVDS_H;
+	bool objective_errVGS_H;
+
+	bool objective_errID_L;
+	bool objective_errVDS_L;
+	bool objective_errVGS_L;
+
 	bool save_spaces;
 	bool save_estimation;
 	bool save_objectives_details;
 	string default_settings_file;
-	struct
-	{
-		int enabled;
-		float threshold;
-		int min,max;
-	} approx_settings;
 
 	bool save_restore;
 	//G
@@ -153,11 +156,11 @@ struct Configuration
 struct Simulation
 {
 	double avg_err_VGS, avg_err_ID, avg_err_VDS;
+	double err_VGS_H, err_ID_H, err_VDS_H;
+	double err_VGS_L, err_ID_L, err_VDS_L;
 	Configuration config;
 	bool simulated;
 	void add_simulation(const Simulation&);
-private:
-	vector<double> avg_err_VGS_v, avg_err_ID_v, avg_err_VDS_v;
 };
 
 struct Dynamic_stats

@@ -15,7 +15,6 @@ UserInterface::UserInterface(const string& path){
 	my_explorer = new Explorer(matlab_interface);
 
 	user_settings.default_settings_file = base_path + "M9_default.conf";
-	load_settings(user_settings.default_settings_file);
 }
 
 UserInterface::~UserInterface(){
@@ -102,9 +101,6 @@ int UserInterface::show_menu()
 		cin >> ch;
 	}
 	string start;
-
-	if ( ch=='g' || ch=='d' || ch=='s' || ch=='w' || ch=='p' || ch=='e' || ch =='r' || ch=='v')
-		my_explorer->init_approximation();
 
 	switch (ch)
 	{
@@ -269,9 +265,6 @@ void UserInterface::edit_user_settings()
 
 		cout << "\n  S e t t i n g s  ";
 		cout << "\n ----------------------------------------------------------";
-		cout << "\n  (1) - Objective ID               --> " << status_string(user_settings.objective_avg_errID);
-		cout << "\n  (2) - Objective VDS     --> " << status_string(user_settings.objective_avg_errVDS);
-		cout << "\n  (3) - Objective VGS             --> " << status_string(user_settings.objective_avg_errVGS);
 		cout << "\n  (5) - save simulated spaces        --> " << status_string(user_settings.save_spaces);
 		cout << "\n  (8) - Save matlab tcc logs       --> " << status_string(user_settings.save_matlog);
 		cout << "\n  (9) - save estimation detail files --> " << status_string(user_settings.save_estimation);
@@ -284,9 +277,6 @@ void UserInterface::edit_user_settings()
 
 		cin >> ch;
 
-		if (ch=="1") user_settings.objective_avg_errID =   !user_settings.objective_avg_errID;
-		if (ch=="2") user_settings.objective_avg_errVDS = !user_settings.objective_avg_errVDS;
-		if (ch=="3") user_settings.objective_avg_errVGS = !user_settings.objective_avg_errVGS;
 		if (ch=="5") user_settings.save_spaces = !user_settings.save_spaces;
 		if (ch=="8")
 		{
@@ -294,7 +284,6 @@ void UserInterface::edit_user_settings()
             matlab_interface->set_save_matlog(user_settings.save_matlog);
 		}
 		if (ch=="9") user_settings.save_estimation = !user_settings.save_estimation;
-		if (ch=="s") save_settings_wrapper();
 
 	} while(ch!="q");
 
@@ -374,125 +363,6 @@ void UserInterface::set_subspace_wrapper()
 		chdir(old_path);
 	}
 }
-
-
-void UserInterface::load_settings(string settings_file)
-{
-
-	FILE * fp;
-	fp = fopen(settings_file.c_str(),"r");
-
-	// if there is no config file a default one is created
-	if (fp==NULL)
-	{
-		cout << "\n WARNING:configuration file not found... creating it ";
-		user_settings.objective_avg_errID = false;
-		user_settings.objective_avg_errVDS = true;
-		user_settings.objective_avg_errVGS = false;
-		user_settings.save_spaces = false;
-		user_settings.save_estimation = false;
-		user_settings.approx_settings.enabled = 0;
-		user_settings.approx_settings.threshold = 0;
-		user_settings.approx_settings.min = 0;
-		user_settings.approx_settings.max = 0;
-		user_settings.save_restore = false;
-		user_settings.save_matlog = false;
-
-		fp= fopen(settings_file.c_str(),"w");
-		fclose(fp);
-		save_settings(settings_file);
-	}
-
-	else fclose(fp);
-
-	std::ifstream input_file (settings_file.c_str());
-
-	if (!input_file)
-	{
-		cout << "\n Error while loading " << settings_file;
-		wait_key();
-	}
-	else
-	{
-		cout << "LOADING SETTINGS (false)"<< endl;
-	    /*
-		user_settings.objective_avg_errID = false;
-		user_settings.objective_avg_errVDS = false;
-		user_settings.objective_avg_errVGS = false;
-		user_settings.save_spaces = false;
-		user_settings.save_estimation = false;
-		user_settings.save_matlog = false;
-        user_settings.save_restore = false;
-
-		go_until("avg_err_ID",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_avg_errID = true;
-
-		go_until("avg_err_VDS",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_avg_errVDS = true;
-
-		go_until("avg_err_VGS",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.objective_avg_errVGS = true;
-
-		go_until("save_spaces",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.save_spaces = true;
-
-
-		go_until("save_estimation",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.save_estimation = true;
-
-		go_until("save_matlog",input_file);
-		input_file >> word;
-		if (word=="ENABLED") user_settings.save_matlog= true;
-
-
-
-        matlab_interface->set_save_matlog(user_settings.save_matlog);
-
-		my_explorer->set_options(user_settings);
-	     */
-	}
-}
-
-void UserInterface::save_settings_wrapper()
-{
-	string dir = getenv(BASE_DIR)+string(M9DSE_PATH);
-
-	cout << "\n User settings file will be saved in: ";
-	cout << "\n " << dir ;
-
-	save_settings(dir+"M9_default.conf");
-}
-
-
-void UserInterface::save_settings(string settings_file)
-{
-	std::ofstream output_file(settings_file.c_str());
-
-	if (!output_file)
-	{
-		cout << "\n Error while saving " << settings_file ;
-		wait_key();
-	}
-	else
-	{
-		output_file << "\n\n# M9DSE Explorer settings";
-
-		output_file << "\navg_err_ID " << status_string(user_settings.objective_avg_errID);
-		output_file << "\navg_err_VDS " << status_string(user_settings.objective_avg_errVDS);
-		output_file << "\navg_err_VGS " << status_string(user_settings.objective_avg_errVGS);
-		output_file << "\nsave_spaces " << status_string(user_settings.save_spaces);
-		output_file << "\nsave_estimation " << status_string(user_settings.save_estimation);
-		output_file << "\nsave_matlog " << status_string(user_settings.save_matlog);
-
-		cout << "\n Ok, saved current settings in " << settings_file;
-	}
-}
-
 
 
 void UserInterface::reload_system_config()

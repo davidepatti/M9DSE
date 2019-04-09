@@ -268,6 +268,7 @@ void Explorer::start_PBSA()
 // ********************************************************************
 double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const vector<Simulation>& all_sims)
 {
+    assert(n_obj==3);
     vector<Simulation> VGS_sorted = sort_by_VGS(all_sims);
     vector<Simulation> VDS_sorted = sort_by_VDS(all_sims);
     vector<Simulation> ID_sorted = sort_by_ID(all_sims);
@@ -308,6 +309,7 @@ double Explorer::get_sensivity_PBSA(const vector<Simulation>& simulations,const 
 //**************************************************************
 double Explorer::get_sensivity_VGSVDS(const vector<Simulation>& sims)
 {
+    assert(n_obj==3);
     vector<Simulation> temp = sort_by_VGSVDS_product(sims);
 
     double min_product = (temp[0].avg_err_VGS)*(temp[0].avg_err_VDS);

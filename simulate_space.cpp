@@ -40,10 +40,24 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 
 		dyn_stats = matlabInterface->get_dynamic_stats();
 
-		estimate = estimator.get_estimate(dyn_stats);
-		current_sim.avg_err_VGS = estimate.avg_err_VGS;
-		current_sim.avg_err_VDS = estimate.avg_err_VDS;
-		current_sim.avg_err_ID = estimate.avg_err_ID;
+		if (n_obj==3) {
+			estimate = estimator.get_estimate(dyn_stats);
+			current_sim.avg_err_VGS = estimate.avg_err_VGS;
+			current_sim.avg_err_VDS = estimate.avg_err_VDS;
+			current_sim.avg_err_ID = estimate.avg_err_ID;
+		}
+		else if (n_obj==6)
+		{
+		    current_sim.err_VGS_H = dyn_stats.err_VGS_H;
+			current_sim.err_VDS_H = dyn_stats.err_VDS_H;
+			current_sim.err_ID_H = dyn_stats.err_ID_H;
+
+			current_sim.err_VGS_L = dyn_stats.err_VGS_L;
+			current_sim.err_VDS_L = dyn_stats.err_VDS_L;
+			current_sim.err_ID_L = dyn_stats.err_ID_L;
+		}
+		else assert(false);
+
 		current_sim.simulated = true;//do_simulation;
 
         simulations.push_back(current_sim);
@@ -73,11 +87,8 @@ vector<Simulation> Explorer::simulate_loop(const vector<Configuration>& space)
 		save_estimation_file(dyn_stats,estimate, filename);	//db
 	}
 
-	if (Options.save_objectives_details) //
-	{
-		string filename= current_algo+"_"+".details";
-		saveObjectivesDetails(dyn_stats, current_sim.config, filename);
-	}
+	//string filename= current_algo+"_"+".details";
+    //saveObjectivesDetails(dyn_stats, current_sim.config, filename);
 	// -------------------------------------------------------------------
 
 	write_to_log(myid,logfile,"Finished simulate_loop (space size: "+to_string(space.size())+")");

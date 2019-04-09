@@ -41,7 +41,7 @@ DONE :
 - get_pareto3d(...) , il for piu' esterno arriva fino a size-1,
   probabilmente perche' nella versione originare si confrontava solo
   ognuno con i prossimi;
-- get_pareto3d(...) , le simulazioni ripetute identiche si dominano a
+- getPareto3d(...) , le simulazioni ripetute identiche si dominano a
   vicenda e dunque scompaiono !
 
 - Intercettare la risimulazione dello stesso sottospazio (es.

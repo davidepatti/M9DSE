@@ -20,12 +20,6 @@ void Explorer::start_GA(const GA_parameters& parameters)
     string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
     int myrank = get_mpi_rank();
 
-
-    if (Options.approx_settings.enabled == 1)
-        current_algo+="_fuzzy";
-    if (Options.approx_settings.enabled == 2)
-        current_algo+="_ANN";
-
     eud.ht_ga = new HashGA(DEF_HASH_TABLE_SIZE);
     eud.history.clear();
     eud.pareto.clear();
@@ -193,6 +187,12 @@ void Explorer::GA_evaluate(population* pop)
             sim.avg_err_VDS = BIG_VDS;
             sim.avg_err_VGS = BIG_VGS;
             sim.avg_err_ID = BIG_ID;
+            sim.err_VDS_H = BIG_VDS;
+            sim.err_VGS_H = BIG_VGS;
+            sim.err_ID_H = BIG_ID;
+            sim.err_VDS_L = BIG_VDS;
+            sim.err_VGS_L = BIG_VGS;
+            sim.err_ID_L = BIG_ID;
             vsim[index] = sim;
         }
         else {
@@ -221,6 +221,7 @@ void Explorer::GA_evaluate(population* pop)
             eud.pareto.push_back(sim);
             eud.pareto = get_pareto(eud.pareto); //FIXME TODO perche lo fa ogni volta invece di farlo solo alla fine?
         } else if (!isDominated(sim, eud.pareto)){ //if it could be a pareto solution, the configuration is simulated
+            assert(false);
             //FIXME
             //		explorer->set_force_simulation(true);
             //		sim = explorer->simulate_space(vconf)[0];
@@ -242,12 +243,22 @@ void Explorer::GA_evaluate(population* pop)
     //    int disp = bench * n_obj;
     for(int i=0; i<pop->size(); i++)
     {
-        (*pop)[i].objectives[0] = vsim[i].avg_err_VDS;
-
-        if( (*pop)[i].objectives_dim() > 1)
+        if( (*pop)[i].objectives_dim() == 3)
+        {
+            (*pop)[i].objectives[0] = vsim[i].avg_err_VDS;
             (*pop)[i].objectives[1] = vsim[i].avg_err_VGS;
-        if( (*pop)[i].objectives_dim() > 2)
             (*pop)[i].objectives[2] = vsim[i].avg_err_ID;
+        }
+        else if( (*pop)[i].objectives_dim() == 6){
+                (*pop)[i].objectives[0] = vsim[i].err_VGS_H;
+                (*pop)[i].objectives[1] = vsim[i].err_VGS_L;
+                (*pop)[i].objectives[2] = vsim[i].err_VDS_H;
+                (*pop)[i].objectives[3] = vsim[i].err_VDS_L;
+                (*pop)[i].objectives[4] = vsim[i].err_ID_H;
+                (*pop)[i].objectives[5] = vsim[i].err_ID_L;
+            }
+
+        else assert(false);
     }
 
 }

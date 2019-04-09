@@ -30,11 +30,7 @@ private:
 
 	void edit_user_settings();
 
-	void save_settings(string settings_file);
-	void save_settings_wrapper();
-	void load_settings(string settings_file);
-
-	void set_subspace_wrapper();
+    void set_subspace_wrapper();
 
 	void start_exploration_message();
 
