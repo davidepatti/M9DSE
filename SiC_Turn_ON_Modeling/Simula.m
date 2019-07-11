@@ -58,6 +58,9 @@ L_eq=L_dH+L_sH_int+L_sH1+L_dL+L_sL_int+L_sL1;
 %% Simulazioni
 
 % In questa parte viene lanciata la simulazione con i parametri selezionati
+
+%interp1(...); => interp1(..., 'previous','extrap');
+
 cd 'Simulazioni ON'
 Turn_on;
 cd ..
@@ -65,32 +68,34 @@ cd ..
 load(['data_on_',num2str(I_L),'A_',num2str(R_g),'Ohm.mat']);
 
 % interpolation
-VgsH_sim_new = interp1(t_sim,VgsH_sim,t_exp_HS);
+VgsH_sim_new = interp1(t_sim,VgsH_sim,t_exp_HS, 'previous','extrap');
 error_VgsH = sum(abs(VgsH_exp-VgsH_sim_new'))/length(t_exp_HS);
+
+
 save("error_VgsH.txt","error_VgsH","-ascii");
 
 % interpolation
-VdsH_sim_new = interp1(t_sim,VdsH_sim,t_exp_HS);
+VdsH_sim_new = interp1(t_sim,VdsH_sim,t_exp_HS, 'previous','extrap');
 error_VdsH = sum(abs(VdsH_exp-VdsH_sim_new'))/length(t_exp_HS);
 save("error_VdsH.txt","error_VdsH","-ascii");
 
 % interpolation
-IdH_sim_new = interp1(t_sim,IdH_sim,t_exp_HS);
+IdH_sim_new = interp1(t_sim,IdH_sim,t_exp_HS, 'previous','extrap');
 error_IdH = sum(abs(IdH_exp-IdH_sim_new'))/length(t_exp_HS);
 save("error_IdH.txt","error_IdH","-ascii");
 
 % interpolation
-VgsL_sim_new = interp1(t_sim,VgsL_sim,t_exp_LS);
+VgsL_sim_new = interp1(t_sim,VgsL_sim,t_exp_LS, 'previous','extrap');
 error_VgsL = sum(abs(VgsL_exp-VgsL_sim_new'))/length(t_exp_LS);
 save("error_VgsL.txt","error_VgsL","-ascii");
 
 % interpolation
-VdsL_sim_new = interp1(t_sim,VdsL_sim,t_exp_LS);
+VdsL_sim_new = interp1(t_sim,VdsL_sim,t_exp_LS, 'previous','extrap');
 error_VdsL = sum(abs(VdsL_exp-VdsL_sim_new'))/length(t_exp_LS);
 save("error_VdsL.txt","error_VdsL","-ascii");
 
 % interpolation
-IdL_sim_new = interp1(t_sim,IdL_sim,t_exp_LS);
+IdL_sim_new = interp1(t_sim,IdL_sim,t_exp_LS, 'previous','extrap');
 error_IdL = sum(abs(IdL_exp-IdL_sim_new'))/length(t_exp_LS);
 save("error_IdL.txt","error_IdL","-ascii");
 
