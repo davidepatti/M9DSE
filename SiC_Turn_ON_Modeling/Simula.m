@@ -67,10 +67,11 @@ cd ..
 %% Plot
 load(['data_on_',num2str(I_L),'A_',num2str(R_g),'Ohm.mat']);
 
+%% Added for M9DSE
+
 % interpolation
 VgsH_sim_new = interp1(t_sim,VgsH_sim,t_exp_HS, 'previous','extrap');
 error_VgsH = sum(abs(VgsH_exp-VgsH_sim_new'))/length(t_exp_HS);
-
 
 save("error_VgsH.txt","error_VgsH","-ascii");
 

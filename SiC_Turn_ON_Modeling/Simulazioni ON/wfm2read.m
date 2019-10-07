@@ -151,11 +151,11 @@ if isempty(pname)
     pname='.';
 end
 
-if exist([pname,'/', fname,'.wfm'],'file')~=2
+if exist([pname,'\', fname,'.wfm'],'file')~=2
     error(['Invalid file name: ' filename]);
 end
 
-filename=[pname,'/',fname,'.wfm'];
+filename=[pname,'\',fname,'.wfm'];
 
 [fid,message]=fopen(filename);
 

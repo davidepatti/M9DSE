@@ -26,7 +26,7 @@
 #define BIG_VGS      100
 #define BIG_ID        100
 
-#define N_OBJ 6
+#define N_OBJ 3
 
 
 using namespace std;

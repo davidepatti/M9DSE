@@ -1,9 +1,9 @@
 %% Condizioni operative
 
 % Corrente di carico    
-I_L=10;
+%I_L=10;
 % I_L=30;
-% I_L=50;
+ I_L=50;
 % I_L=70;
 
 % Resistenze di gate
@@ -28,6 +28,8 @@ R_g_L_ext=R_gL;
 % Calcolo delle resistenze utilizzate nella fase di simulazione 
 R_g_H=R_g_H_int+R_g_H_ext;
 R_g_L=R_g_L_int+R_g_L_ext;
+
+params
 
 
 %% Induttanze
@@ -87,6 +89,47 @@ cd ..
 
 %% Plot
 load(['data_off_',num2str(I_L),'A_',num2str(R_gH),'Ohm.mat']);
+
+%% Added for M9DSE 
+
+% interpolation
+VgsH_sim_new = interp1(t_sim,VgsH_sim,t_exp_HS, 'previous','extrap');
+error_VgsH = sum(abs(VgsH_exp-VgsH_sim_new'))/length(t_exp_HS);
+
+save("error_VgsH.txt","error_VgsH","-ascii");
+
+% interpolation
+VdsH_sim_new = interp1(t_sim,VdsH_sim,t_exp_HS, 'previous','extrap');
+error_VdsH = sum(abs(VdsH_exp-VdsH_sim_new'))/length(t_exp_HS);
+save("error_VdsH.txt","error_VdsH","-ascii");
+
+% interpolation
+IdH_sim_new = interp1(t_sim,IdH_sim,t_exp_HS, 'previous','extrap');
+error_IdH = sum(abs(IdH_exp-IdH_sim_new'))/length(t_exp_HS);
+save("error_IdH.txt","error_IdH","-ascii");
+
+% interpolation
+VgsL_sim_new = interp1(t_sim,VgsL_sim,t_exp_LS, 'previous','extrap');
+error_VgsL = sum(abs(VgsL_exp-VgsL_sim_new'))/length(t_exp_LS);
+save("error_VgsL.txt","error_VgsL","-ascii");
+
+% interpolation
+VdsL_sim_new = interp1(t_sim,VdsL_sim,t_exp_LS, 'previous','extrap');
+error_VdsL = sum(abs(VdsL_exp-VdsL_sim_new'))/length(t_exp_LS);
+save("error_VdsL.txt","error_VdsL","-ascii");
+
+% interpolation
+IdL_sim_new = interp1(t_sim,IdL_sim,t_exp_LS, 'previous','extrap');
+error_IdL = sum(abs(IdL_exp-IdL_sim_new'))/length(t_exp_LS);
+save("error_IdL.txt","error_IdL","-ascii");
+
+error_HL = [error_VgsH error_VdsH error_IdH error_VgsL error_VdsL error_IdL ]
+
+save("error_HL.txt","error_HL","-ascii");
+
+disp("CIAO HO FINITO - Ora plotto!");
+%------
+
 f1=figure;
 
 subplot(2,3,1)
