@@ -1,0 +1,107 @@
+<html>
+    <head>
+        <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+        <link rel="stylesheet" type="text/css" href="./htdocs/style.css">
+    </head>
+
+    <body>        
+        <div>
+            <h1>M9DSE</h1>
+            <h2 id="current_simulation"></h2>
+        </div>
+
+        <div>
+            <label class="rightlabel">Max Vgs_H:
+                <input type="text" id="maxVgsH" name="maxVgsH"> (
+                <a href="javascript:set2target('maxVgsH', 0)">set to target</a> | 
+                <a href="javascript:set2target('maxVgsH',-1)">clear</a>)
+            </label><br/>
+            <label class="rightlabel">Max Vgs_L:
+                <input type="text" id="maxVgsL" name="maxVgsL"> (
+                <a href="javascript:set2target('maxVgsL', 1)">set to target</a> |
+                <a href="javascript:set2target('maxVgsL',-1)">clear</a>)
+            </label><br/>
+            <label class="rightlabel">Max Vds_H:
+                <input type="text" id="maxVdsH" name="maxVdsH"> (
+                <a href="javascript:set2target('maxVdsH', 2)">set to target</a> | 
+                <a href="javascript:set2target('maxVdsH',-1)">clear</a>)
+            </label><br/>
+            <label class="rightlabel">Max Vds_L:
+                <input type="text" id="maxVdsL" name="maxVdsL"> (
+                <a href="javascript:set2target('maxVdsL', 3)">set to target</a> | 
+                <a href="javascript:set2target('maxVdsL',-1)">clear</a>)
+            </label><br/>
+            <label class="rightlabel">Max Id_H:
+                <input type="text" id="maxIdH" name="maxIdH"> (
+                <a href="javascript:set2target('maxIdH', 4)">set to target</a> | 
+                <a href="javascript:set2target('maxIdH',-1)">clear</a>)
+            </label><br/>
+            <label class="rightlabel">Max Id_L:
+                <input type="text" id="maxIdL" name="maxIdL"> (
+                <a href="javascript:set2target('maxIdL', 5)">set to target</a> |
+                <a href="javascript:set2target('maxIdL',-1)">clear</a>)
+            </label><br/>
+
+        </div>
+
+        <div>
+            <table id="pareto" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Vgs_H</th>
+                        <th>Vgs_L</th>
+                        <th>Vds_H</th>
+                        <th>Vds_L</th>
+                        <th>Id_H</th>
+                        <th>Id_L</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th></th>
+                        <th>Vgs_H</th>
+                        <th>Vgs_L</th>
+                        <th>Vds_H</th>
+                        <th>Vds_L</th>
+                        <th>Id_H</th>
+                        <th>Id_L</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div>
+            <h3>Target values (<a href="javascript:setTargetValues()">Set</a>)</h3>
+            <table>
+                <tr>   
+                    <td class="Tlabel">Vgs_H =</td><td> <input type="text" id="TvgsH" class="Tvalue"></td>
+                    <td class="Tlabel">Vgs_L =</td><td> <input type="text" id="TvgsL" class="Tvalue"></td>
+                </tr>  
+                <tr>   
+                    <td class="Tlabel">Vds_H =</td><td> <input type="text" id="TvdsH" class="Tvalue"></td>
+                    <td class="Tlabel">Vds_L =</td><td> <input type="text" id="TvdsL" class="Tvalue"></td>
+                </tr>  
+                <tr>   
+                    <td class="Tlabel">Id_H =</td><td> <input type="text"id="TidH" class="Tvalue"></td>
+                    <td class="Tlabel">Id_L =</td><td> <input type="text"id="TidL" class="Tvalue"></td>
+                </tr>  
+            </table>
+        </div>
+        <div>
+            Latest Pareto Set ( 
+            <a href="./pareto.latest.json" target="_blank">JSON</a> |
+            <a href="./pareto.latest.tsv" target="_blank">TSV</a> | 
+            <a href="./pareto.latest.txt" target="_blank">TXT</a> )
+            &nbsp;|&nbsp;
+            <a href="./screenlog.txt" target="_blank">ScreenLog</a>
+            &nbsp;|&nbsp;
+            <a href="./M9DSE.txt" target="_blank">M9DSE.log</a>
+
+        </div>
+
+        <script src="./htdocs/main.js"></script>
+    </body>
+</html>
