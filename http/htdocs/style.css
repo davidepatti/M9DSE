@@ -1,0 +1,27 @@
+.rightlabel {
+    position:absolute;
+    right:10px;
+}
+
+.Tlabel {
+    text-align: right;
+    font-weight: bold;
+}
+
+.Tvalue {
+    text-align: right;
+    font-family: monospace;
+}
+
+td.details-control {
+    background: url('./imgs/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+
+tr.shown td.details-control {
+    background: url('./imgs/details_close.png') no-repeat center center;
+}
+
+div {
+    margin: 10px 0px;
+}

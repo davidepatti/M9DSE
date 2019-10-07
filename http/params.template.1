@@ -1,0 +1,31 @@
+%% Metriche
+% Vgs_H = $VGS_H
+% Vgs_L = $VGS_L
+% Vds_H = $VDS_H
+% Vds_L = $VDS_L
+% Id_H  = $ID_H
+% Id_L  = $ID_L
+
+%% Induttanze
+% Induttanze parassite di bonding interne al package
+L_d_int=$L_d_int;   % Riferimento Q3D 0.38e-9;   % Valore modificabile
+L_s_int=$L_s_int;  % Riferimento Q3D 6.41e-9;   % Valore modificabile
+L_g_int=$L_g_int;  % Riferimento Q3D 8.76e-9;   % Valore modificabile
+
+% Induttanze parassite dei pin esterne al package (supponiamo che G e S siano uguali)
+L_d_pin=$L_d_pin;   % Riferimento Q3D 13.46e-9;   % Valore modificabile
+L_s_pin=$L_s_pin;   % Riferimento Q3D 10.95e-9;   % Valore modificabile
+L_g_pin=$L_g_pin;   % Riferimento Q3D 10.99e-9;
+
+% Induttanze parassite del PCB
+L_dH_ext=$L_dH_ext;  % Riferimento Q3D 50e-9;   % Valore modificabile
+L_sH_ext=$L_sH_ext;  % Riferimento Q3D 12.5e-9;   % Valore modificabile
+L_gH_ext=$L_gH_ext;  % Riferimento Q3D 12e-9;   % Valore modificabile
+L_dL_ext=$L_dL_ext;  % Riferimento Q3D 12.5e-9;   % Valore modificabile
+L_sL_ext=$L_sL_ext;  % Riferimento Q3D 48e-9;   % Valore modificabile
+L_gL_ext=$L_gL_ext;  % Riferimento Q3D 12e-9;   % Valore modificabile
+
+% Induttanze parassite dei cavi per i collegamenti di Kelvin-Source
+L_Hwire=$L_Hwire; % Riferimento Q3D 10.95e-9;   % Valore modificabile
+L_Lwire=$L_Lwire; % Riferimento Q3D 10.95e-9;   % Valore modificabile
+
