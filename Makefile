@@ -32,31 +32,27 @@ CFLAGS += -DSEVERE_DEBUG
 
 all: M9
 
-M9: ${GALIB_DIR}/libspea2.a explorer.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
-	estimator.o avg_err_ID.o time.o model_inverter.o \
-	main.o user_interface.o matlabInterface.o \
+M9: ${GALIB_DIR}/libspea2.a explorer.o alg_random.o alg_sensivity.o alg_genetic.o \
+	estimator.o  model_inverter.o \
+	main.o user_interface.o matlab_interface.o \
 	parameter.o common.o simulate_space.o \
-	FuzzyApprox.o RuleList.o FuzzyWrapper.o alg_paramspace.o
-	${MPICC} explorer.o simulate_space.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
-	user_interface.o matlabInterface.o estimator.o avg_err_ID.o time.o \
-	model_inverter.o mem_hierarchy.o main.o parameter.o common.o \
-	FuzzyApprox.o RuleList.o FuzzyWrapper.o alg_paramspace.o \
+	FuzzyApprox.o RuleList.o FuzzyWrapper.o 
+	${MPICC} explorer.o simulate_space.o alg_random.o alg_sensivity.o alg_genetic.o \
+	user_interface.o matlab_interface.o estimator.o \
+	model_inverter.o main.o parameter.o common.o \
+	FuzzyApprox.o RuleList.o FuzzyWrapper.o \
 	-L${GALIB_DIR} -lspea2 -o M9
 
-estimator.o: estimator.cpp estimator.h model_inverter.h mem_hierarchy.h \
-	power_densities.h cacti_ID_interface.h
+estimator.o: estimator.cpp estimator.h model_inverter.h 
 	${CXX} ${CFLAGS} -c estimator.cpp
 
-explorer.o: explorer.cpp explorer.h model_inverter.h matlabInterface.h \
+explorer.o: explorer.cpp explorer.h model_inverter.h matlab_interface.h \
 	estimator.h parameter.h common.h \
-	FunctionApprox.h FuzzyApprox.h FannApprox.h
+	FunctionApprox.h FuzzyApprox.h 
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c explorer.cpp
 
 simulate_space.o: simulate_space.cpp explorer.h 
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c simulate_space.cpp
-
-alg_dep.o: alg_dep.cpp explorer.h common.h
-	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c alg_dep.cpp
 
 alg_sensivity.o: alg_sensivity.cpp explorer.h common.h
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c alg_sensivity.cpp
@@ -67,35 +63,22 @@ alg_random.o: alg_random.cpp explorer.h common.h
 alg_genetic.o: alg_genetic.cpp explorer.h common.h
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c alg_genetic.cpp
 
-alg_paramspace.o: alg_paramspace.cpp paramspace.h
-	 ${MPICC} -I${GAINC_DIR} ${CFLAGS} -c alg_paramspace.cpp
-
 model_inverter.o: model_inverter.cpp model_inverter.h parameter.h
 	${CXX} ${CFLAGS} -c model_inverter.cpp
-
-mem_hierarchy.o: mem_hierarchy.cpp mem_hierarchy.h parameter.h
-	${CXX} ${CFLAGS} -c mem_hierarchy.cpp
 
 main.o: main.cpp user_interface.h
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c main.cpp
 
 user_interface.o: user_interface.cpp user_interface.h \
-	explorer.h estimator.h matlabInterface.h model_inverter.h \
-	mem_hierarchy.h environment.h version.h
+	explorer.h estimator.h matlab_interface.h model_inverter.h \
+	environment.h version.h
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c user_interface.cpp
 
-matlabInterface.o: matlabInterface.cpp matlabInterface.h model_inverter.h
-	${MPICC} ${CFLAGS} -c matlabInterface.cpp
-
-avg_err_ID.o: cacti.h avg_err_ID.c
-	${CC} ${CFLAGS} -c avg_err_ID.c
-
-time.o: cacti.h time.c 
-	${CC} ${CFLAGS} -c time.c
+matlab_interface.o: matlab_interface.cpp matlab_interface.h model_inverter.h
+	${MPICC} ${CFLAGS} -c matlab_interface.cpp
 
 parameter.o: parameter.cpp parameter.h 
 	${CXX} ${CFLAGS} -c parameter.cpp
-
 
 common.o: common.cpp common.h 
 	${MPICC} ${CFLAGS} -c common.cpp
