@@ -12,6 +12,8 @@ I_L=50;
 % Resistenza di gate
 R_g=10;
 
+
+
 %% Resistenze
 % Resistenze interne al package (uguali se si utilizzano gli stessi
 % dispositivi): NON DOVREBBE SERVIRE CAMBIARLE
@@ -111,7 +113,7 @@ f1=figure;
 subplot(2,3,1)
 hold on
 plot(t_sim, VgsH_sim, 'b');
-plot(t_exp_HS, VgsH_exp, 'r.');
+plot(t_exp_HS, VgsH_exp, 'r');
 %------
 grid on;
 title(['V_G_S del dispositivo di High Side  [V]']);
