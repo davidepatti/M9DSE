@@ -27,9 +27,9 @@ void evaluate(population *pop){
 	        if(it->objectives_dim() == 2){
 	                double even=0,by3=0;
 	                for(int i=0; i<it->chromosome_dim(); i++){
-	                        if(it->phenotype(i) % 2 == 0)
+	                        if((int)(it->phenotype(i)) % 2 == 0)
 	                                even++;
-	                        if(it->phenotype(i) % 3 == 0)
+	                        if((int)(it->phenotype(i)) % 3 == 0)
 	                                by3++;
 	                }
 			it->objectives[0] = even;
