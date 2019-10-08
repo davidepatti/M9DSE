@@ -21,6 +21,7 @@ R_gL=2.2;
 R_g_H_int=1.2;
 R_g_L_int=1.2;
 
+
 % Resistenze esterne (imposte dalle condizioni operative)
 R_g_H_ext=R_gH;
 R_g_L_ext=R_gL;
@@ -65,6 +66,9 @@ cd ..
 
 %% Plot
 load(['data_off_',num2str(I_L),'A_',num2str(R_gH),'Ohm.mat']);
+
+t_exp_HS = t_exp_HS';
+t_exp_LS = t_exp_LS';
 
 %% Added for M9DSE 
 
