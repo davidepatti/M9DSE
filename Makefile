@@ -32,26 +32,23 @@ CFLAGS += -DSEVERE_DEBUG
 
 all: M9
 
-M9: ${GALIB_DIR}/libspea2.a compiler.o explorer.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
-	estimator.o avg_err_ID.o time.o model_inverter.o mem_hierarchy.o \
+M9: ${GALIB_DIR}/libspea2.a explorer.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
+	estimator.o avg_err_ID.o time.o model_inverter.o \
 	main.o user_interface.o matlabInterface.o \
 	parameter.o common.o simulate_space.o \
 	FuzzyApprox.o RuleList.o FuzzyWrapper.o alg_paramspace.o
-	${MPICC} compiler.o explorer.o simulate_space.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
+	${MPICC} explorer.o simulate_space.o alg_dep.o alg_random.o alg_sensivity.o alg_genetic.o \
 	user_interface.o matlabInterface.o estimator.o avg_err_ID.o time.o \
 	model_inverter.o mem_hierarchy.o main.o parameter.o common.o \
 	FuzzyApprox.o RuleList.o FuzzyWrapper.o alg_paramspace.o \
 	-L${GALIB_DIR} -lspea2 -o M9
-
-compiler.o: compiler.cpp compiler.h parameter.h
-	${CXX} -I${GAINC_DIR} ${CFLAGS} -c compiler.cpp
 
 estimator.o: estimator.cpp estimator.h model_inverter.h mem_hierarchy.h \
 	power_densities.h cacti_ID_interface.h
 	${CXX} ${CFLAGS} -c estimator.cpp
 
 explorer.o: explorer.cpp explorer.h model_inverter.h matlabInterface.h \
-	mem_hierarchy.h estimator.h parameter.h common.h \
+	estimator.h parameter.h common.h \
 	FunctionApprox.h FuzzyApprox.h FannApprox.h
 	${MPICC} -I${GAINC_DIR} ${CFLAGS} -c explorer.cpp
 

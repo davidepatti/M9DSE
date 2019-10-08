@@ -1,0 +1,3 @@
+/sim/M9DSE/build/CMakeFiles/rebuild_cache.dir
+/sim/M9DSE/build/CMakeFiles/M9DSE.dir
+/sim/M9DSE/build/CMakeFiles/edit_cache.dir
