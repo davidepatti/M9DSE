@@ -1,10 +1,7 @@
 %% Metriche
-% Vgs_H = $VGS_H
-% Vgs_L = $VGS_L
-% Vds_H = $VDS_H
-% Vds_L = $VDS_L
-% Id_H  = $ID_H
-% Id_L  = $ID_L
+% Vgs = $VGS
+% Vds = $VDS
+% Id  = $ID
 
 %% Induttanze
 % Induttanze parassite di bonding interne al package
