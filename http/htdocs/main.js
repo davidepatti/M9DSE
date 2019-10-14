@@ -1,9 +1,9 @@
 $(document).ready(function() {
 
     target = [
-        1.009417120146360,
-        0.463509966667219,
-        19.837957528039961
+        1.8,
+        20.0,
+        2.0
     ];
 
     getTargetValues = function () {
