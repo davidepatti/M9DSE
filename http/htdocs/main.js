@@ -1,27 +1,21 @@
 $(document).ready(function() {
 
     target = [
-        1.009417120146360,   0.463509966667219,
-        19.837957528039961, 29.069253843625720,
-        0.602572120759444,   0.773710379993917
+        1.009417120146360,
+        0.463509966667219,
+        19.837957528039961
     ];
 
     getTargetValues = function () {
-        $("#TvgsH").val(target[0]);
-        $("#TvgsL").val(target[1]);
-        $("#TvdsH").val(target[2]);
-        $("#TvdsL").val(target[3]);
-        $("#TidH").val(target[4]);
-        $("#TidL").val(target[5]);
+        $("#Tvgs").val(target[0]);
+        $("#Tvds").val(target[1]);
+        $("#Tid").val(target[2]);
     };
 
     setTargetValues = function () {
-        target[0] = $("#TvgsH").val();
-        target[1] = $("#TvgsL").val();
-        target[2] = $("#TvdsH").val();
-        target[3] = $("#TvdsL").val();
-        target[4] = $("#TidH").val();
-        target[5] = $("#TidL").val();
+        target[0] = $("#Tvgs").val();
+        target[1] = $("#Tvds").val();
+        target[2] = $("#Tid").val();
         table.draw();
     };
 
@@ -66,101 +60,27 @@ $(document).ready(function() {
                 "data": null,
                 "defaultContent": ''
             },
-            { "data": "VGS_H" },
-            { "data": "VGS_L" },
-            { "data": "VDS_H" },
-            { "data": "VDS_L" },
-            { "data": "ID_H" },
-            { "data": "ID_L" }
+            { "data": "VGS" },
+            { "data": "VDS" },
+            { "data": "ID" }
         ],
         "order": [[1, 'asc']]
     } );
 
-    $('#maxVgsH, #maxVgsL, #maxVdsH, #maxVdsL, #maxIdH, #maxIdL').keyup( function() {
+    $('#maxVgs, #maxVds, #maxId').keyup( function() {
         table.draw();
     } );
 
     $.fn.dataTable.ext.search.push(
         function( settings, data, dataIndex ) {
-            var maxVgsH = parseFloat($('#maxVgsH').val());
-            var maxVgsL = parseFloat($('#maxVgsL').val());
-            var maxVdsH = parseFloat($('#maxVdsH').val());
-            var maxVdsL = parseFloat($('#maxVdsL').val());
-            var maxIdH  = parseFloat($('#maxIdH').val() );
-            var maxIdL  = parseFloat($('#maxIdL').val() );
-            var vgsH    = parseFloat(data[1]) || 0;
-            var vgsL    = parseFloat(data[2]) || 0;
-            var vdsH    = parseFloat(data[3]) || 0;
-            var vdsL    = parseFloat(data[4]) || 0;
-            var idH     = parseFloat(data[5]) || 0;
-            var idL     = parseFloat(data[6]) || 0;
+            var maxVgs = parseFloat($('#maxVgs').val());
+            var maxVds = parseFloat($('#maxVds').val());
+            var maxId  = parseFloat($('#maxId').val() );
+            var vgs    = parseFloat(data[0]) || 0;
+            var vds    = parseFloat(data[1]) || 0;
+            var id     = parseFloat(data[2]) || 0;
 
-            if ( 
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( isNaN(maxVgsH) && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && isNaN(maxVgsL) && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && isNaN(maxVdsH) && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && isNaN(maxVdsL) && idH < maxIdH  && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && isNaN(maxIdH) && idL < maxIdL  ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && isNaN(maxIdL) ) ||
-            ( vgsH <maxVgsH  && vgsL <maxVgsL  && vdsH <maxVdsH  && vdsL <maxVdsL  && idH < maxIdH  && idL < maxIdL  )
-            ) {
+            if ( (isNaN(maxVgs) || vgs < (maxVgs)) && (isNaN(maxVds) || vds < (maxVds)) && (isNaN(maxId) || id < (maxId))) {
                 return true;
             }
             return false;
