@@ -76,11 +76,11 @@ $(document).ready(function() {
             var maxVgs = parseFloat($('#maxVgs').val());
             var maxVds = parseFloat($('#maxVds').val());
             var maxId  = parseFloat($('#maxId').val() );
-            var vgs    = parseFloat(data[0]) || 0;
-            var vds    = parseFloat(data[1]) || 0;
-            var id     = parseFloat(data[2]) || 0;
+            var vgs    = parseFloat(data[1]) || 0;
+            var vds    = parseFloat(data[2]) || 0;
+            var id     = parseFloat(data[3]) || 0;
 
-            if ( (isNaN(maxVgs) || vgs < (maxVgs)) && (isNaN(maxVds) || vds < (maxVds)) && (isNaN(maxId) || id < (maxId))) {
+            if ( (isNaN(maxVgs) || vgs < maxVgs) && (isNaN(maxVds) || vds < maxVds) && (isNaN(maxId) || id < maxId)) {
                 return true;
             }
             return false;
