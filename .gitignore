@@ -1,0 +1,6 @@
+*.o
+M9
+SiC_*/*.mat
+SiC_*/*.log
+SiC_*/error_*.txt
+SiC_*/params.m
