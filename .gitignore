@@ -1,4 +1,7 @@
 *.o
+*.history
+*.stat
+*.pareto.exp
 M9
 SiC_*/*.mat
 SiC_*/*.log
