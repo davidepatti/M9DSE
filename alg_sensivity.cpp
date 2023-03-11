@@ -40,9 +40,9 @@ void Explorer::start_SAP()
         sens.push_back(temp);
     }
 
-    string path = get_base_dir()+"/matlab-workspace/M9-explorer/";
-    string name;
-    name = path + name + "_SAP__sensitivity.stat";
+    string name = get_base_dir() + string(M9DSE_PATH);
+    name+= "SAP_sensitivity.stat";
+
     FILE * fp = fopen(name.c_str(),"w");
 
     fprintf(fp,"\n%.14f        %% L_d_int",sens[0]);
@@ -170,7 +170,7 @@ void Explorer::start_PBSA()
         cout << M9DSE_TAG << "sensivity " << p << ": " << sens[p];
     }
 
-    string name = get_base_dir()+"/matlab-workspace/M9-explorer/";
+    string name = get_base_dir() + string(M9DSE_PATH);
     name+= "PBSA_sensitivity.stat";
 
     FILE * fp = fopen(name.c_str(),"w");

@@ -350,7 +350,7 @@ void UserInterface::show_system_config() {
 
 void UserInterface::set_subspace_wrapper()
 {
-	string subspaces_dir = base_path + "/matlab-workspace/M9-explorer/SUBSPACES/";
+	string subspaces_dir = base_path + string(M9DSE_PATH) + "SUBSPACES/";
 	string filename;
 
 	cout << "\n\n List of available subspace files: \n";
@@ -378,7 +378,7 @@ void UserInterface::reload_system_config()
 {
     cout << "RELOADING SYSTEM CONFIG (false)" << endl;
 
-	string filename = base_path + "/matlab-workspace/M9-explorer/step_by_step/machines/space.conf";
+	string filename = base_path + string(M9DSE_PATH) + "step_by_step/machines/space.conf";
 	cout << "\n\n Loading model_inverter configuration: " << filename;
     matlab_interface->load_model_config(&(my_explorer->model_inverter), filename);
 }
