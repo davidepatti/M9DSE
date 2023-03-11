@@ -120,6 +120,8 @@ public:
 
     void load_space_file(const string& space_name);
     void save_space_file(const string& space_name);
+    string get_space_file_line(Parameter param);
+
 
     vector<pair<int,int> > getParameterRanges();
     vector<pair<int,int> > getParametersNumber();

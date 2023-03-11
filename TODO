@@ -1,63 +1,51 @@
-TODO :
-
-META-TODO: Translate this TODO in english !
-------------------------
+TODO:
 
 current version:
-- clean code and make more modular
+- clean code and make it more modular
 - set benchmark directory
 - add new mem parameters allowed by m5
 - use directly the envrc script of matlab instead of environment.h
-- il fuzzy_approx funziona correttamente solo con GA...
-- aggiungere popolazione 2 tra i parametri del GA
+- fuzzy_approx works properly only with GA...
+- add population 2 among GA parameters
 
 
-DONE :
-
+DONE:
 - (REPLACED) implement a MAX_RETRY mechanism in save/restore simulation to avoid
   undefined blocking of exploration process. 
   SOLUTION --> continue on failure option. Retry would be useless when
-  compilation error occour, since they will simply happens again...
+  compilation error occours, since they will simply happens again...
 - move subspace to settings, remove edit
 - Logging of M9DSE explorer activities
 - add compiler space exploration
-- add multicluster support
-- Eliminazione(opzionale) della creazione del file di log di matlab
-- Causalit� GA
-- Uniformare il percorso base tramite chiamata a get_base_dir()
-- Fissare il consumo medio dell'accesso alla main memory ( L2 Misses *
-  Emm)
-- svincolare il nome del file hmdes2
-- segnale (*) per le configurazioni che sono state stimate funziona in
-  modo casuale
-- aggiungere scelta del profilo di compilazione
-- sistemare opzione fuzzy, scrive enabled anzich� 0,1,2
-- Scalare Vdd a 1.3
-- 10% sull'access time
-- Salvare informazioni sul sottospazio considerato direttamente nel
-   file info di ogni esplorazione ;
-- append_simulations(...), non dovrebbe aggiungere simulazioni
-  ripetute
-- get_pareto3d(...) , il for piu' esterno arriva fino a size-1,
-  probabilmente perche' nella versione originare si confrontava solo
-  ognuno con i prossimi;
-- getPareto3d(...) , le simulazioni ripetute identiche si dominano a
-  vicenda e dunque scompaiono !
-
-- Intercettare la risimulazione dello stesso sottospazio (es.
-   crossmerging con un cluster i cui parametri sono tutti fermi)
-- Batch di esplorazioni consecutive prefissate
-- Modifica via software dello spazio di esplorazione
-- Eliminazione dell'output di matlab durante l'esplorazione ,
-   velocita' maggiore ??
-- Sistemare in modo che si salvino ogni tot invece di stare sempre in
-   memoria fino al termine della simulazione -> problemi con benchmark
-   piu' complessi.
+- add multi-cluster support
+- Avoid (optional) the creation of matlab log file
+- GA Causality
+- Uniform the base path by calling get_base_dir()
+- Setting the average consumption of main memory access ( L2 Misses * Emm)
+- make the file name hmdes2 variable
+- signal (*) for configurations that have been estimated works randomly
+- add compilation profile choice
+- fix fuzzy option, write enabled instead of 0,1,2
+- Scale Vdd to 1.3
+- 10% on access time
+- Save information on the subspace considered directly in the info file of each
+  exploration ;
+- append_simulations(...), should not add duplicate simulations
+- get_pareto3d(...) , the outermost for-loop goes up to size-1, probably
+  because the original version only compared each one with the next;
+- getPareto3d(...), identical repeated simulations dominate each other and thus
+  disappear!
+- Intercept resimulation of the same subspace (e.g. crossmerging with a cluster
+  whose parameters are all stationary)
+- Batch of predetermined consecutive explorations
+- Changing the exploration space via software
+- Elimination of matlab output during exploration, increased speed?
+- Arrangement so that they are saved every few instead of always being in memory
+  until the end of the simulation -> problems with more complex benchmarks
   
 
-DEPRECATED
-
-- Settare la creazione dei riferimenti in memoria via software.
-- Usare campi VGS e power separati nella classe Simulation
-- Permettere l'uso di M9DSE da remoto !
-- Resume delle esplorazioni
+DEPRECATED:
+- Set the creation of references in memory via software.
+- Use separate VGS and power fields in the Simulation class
+- Allow M9DSE to be used remotely!
+- Resume explorations

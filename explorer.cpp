@@ -673,18 +673,23 @@ void Explorer::save_estimation_file(const Dynamic_stats &dynamic_stats, const Es
         write_to_log(myid,logfile,"WARNING: Error while saving " + file_path);
     }
     else {
-        // TODO: M9DSE FIX
-        /*
         output_file << "\n >>>>>>>> M9DSE Explorer estimation file: " << filename;
         output_file << "\n";
         output_file << "\n **************************************************";
-        output_file << "\n " << processor.L_d_int.get_val();
-        output_file << "\n " << processor.L_g_pin.get_val();
-        output_file << "," << processor.L_dH_ext.get_val();
-        output_file << "," << processor.L_sH_ext.get_val();
-        output_file << "," << processor.L_gH_ext.get_val();
-        output_file << "," << processor.L_dL_ext.get_val();
-         */
+        output_file << "\n" << model_inverter.L_d_int.get_val();
+        output_file << ","  << model_inverter.L_s_int.get_val();
+        output_file << ","  << model_inverter.L_g_int.get_val();
+        output_file << ","  << model_inverter.L_d_pin.get_val();
+        output_file << ","  << model_inverter.L_s_pin.get_val();
+        output_file << ","  << model_inverter.L_g_pin.get_val();
+        output_file << ","  << model_inverter.L_dH_ext.get_val();
+        output_file << ","  << model_inverter.L_sH_ext.get_val();
+        output_file << ","  << model_inverter.L_gH_ext.get_val();
+        output_file << ","  << model_inverter.L_dL_ext.get_val();
+        output_file << ","  << model_inverter.L_sL_ext.get_val();
+        output_file << ","  << model_inverter.L_gL_ext.get_val();
+        output_file << ","  << model_inverter.L_Hwire.get_val();
+        output_file << ","  << model_inverter.L_Lwire.get_val();
     }
 
 }
@@ -712,11 +717,21 @@ vector<bool> Explorer::get_boolean_mask(const Space_mask& mask)
 {
     vector<bool> b;
 
-    assert(false);
-    /* TODO M9FIX
-    b.push_back(mask.L1D_size);
-    b.push_back(mask.L1D_block);
-     */
+    b.push_back(mask.L_d_int);
+    b.push_back(mask.L_s_int);
+    b.push_back(mask.L_g_int);
+    b.push_back(mask.L_d_pin);
+    b.push_back(mask.L_s_pin);
+    b.push_back(mask.L_g_pin);
+    b.push_back(mask.L_dH_ext);
+    b.push_back(mask.L_sH_ext);
+    b.push_back(mask.L_gH_ext);
+    b.push_back(mask.L_dL_ext);
+    b.push_back(mask.L_sL_ext);
+    b.push_back(mask.L_gL_ext);
+    b.push_back(mask.L_Hwire);
+    b.push_back(mask.L_Lwire);
+
     return b;
 }
 
@@ -725,11 +740,20 @@ Space_mask Explorer::create_space_mask(const vector<bool>& boolean_mask)
 {
     Space_mask mask;
 
-    /* TODO: M9DSE
-    mask.L1D_size = boolean_mask[0];
-    mask.L1D_block = boolean_mask[1];
-    mask.L1D_assoc = boolean_mask[2];
-     */
+    mask.L_d_int = boolean_mask[0];
+    mask.L_s_int = boolean_mask[1];
+    mask.L_g_int = boolean_mask[2];
+    mask.L_d_pin = boolean_mask[3];
+    mask.L_s_pin = boolean_mask[4];
+    mask.L_g_pin = boolean_mask[5];
+    mask.L_dH_ext = boolean_mask[6];
+    mask.L_sH_ext = boolean_mask[7];
+    mask.L_gH_ext = boolean_mask[8];
+    mask.L_dL_ext = boolean_mask[9];
+    mask.L_sL_ext = boolean_mask[10];
+    mask.L_gL_ext = boolean_mask[11];
+    mask.L_Hwire = boolean_mask[12];
+    mask.L_Lwire = boolean_mask[13];
 
     return mask;
 }
@@ -768,144 +792,69 @@ vector<Configuration> Explorer::extract_space(const vector<Simulation>& sims) co
 vector<Configuration> Explorer::build_space(const Space_mask& mask,Configuration base_conf)
 {
     vector<Configuration> space;
-/*
-    model_inverter.num_clusters.set_to_first();
+
+    model_inverter.L_d_int.set_to_first();
     do {
-        if (mask.num_clusters) base_conf.num_clusters=model_inverter.num_clusters.get_val();
-
-        model_inverter.integer_units.set_to_first();
+        if (mask.L_d_int) base_conf.L_d_int = model_inverter.L_d_int.get_val();
+        model_inverter.L_s_int.set_to_first();
         do {
-            if (mask.integer_units) base_conf.integer_units=model_inverter.integer_units.get_val();
-
-            model_inverter.float_units.set_to_first();
+            if (mask.L_s_int) base_conf.L_s_int = model_inverter.L_s_int.get_val();
+            model_inverter.L_g_int.set_to_first();
             do {
-                if (mask.float_units) base_conf.float_units=model_inverter.float_units.get_val();
-
-                model_inverter.memory_units.set_to_first();
+                if (mask.L_g_int) base_conf.L_g_int = model_inverter.L_g_int.get_val();
+                model_inverter.L_d_pin.set_to_first();
                 do {
-                    if (mask.memory_units) base_conf.memory_units=model_inverter.memory_units.get_val();
-
-                    model_inverter.branch_units.set_to_first();
+                    if (mask.L_d_pin) base_conf.L_d_pin = model_inverter.L_d_pin.get_val();
+                    model_inverter.L_s_pin.set_to_first();
                     do {
-                        if (mask.branch_units) base_conf.branch_units=model_inverter.branch_units.get_val();
-
-                        model_inverter.gpr_static_size.set_to_first();
+                        if (mask.L_s_pin) base_conf.L_s_pin = model_inverter.L_s_pin.get_val();
+                        model_inverter.L_g_pin.set_to_first();
                         do {
-                            if (mask.gpr_static_size) base_conf.gpr_static_size=model_inverter.gpr_static_size.get_val();
-
-                            model_inverter.fpr_static_size.set_to_first();
+                            if (mask.L_g_pin) base_conf.L_g_pin = model_inverter.L_g_pin.get_val();
+                            model_inverter.L_dH_ext.set_to_first();
                             do {
-                                if (mask.fpr_static_size) base_conf.fpr_static_size=model_inverter.fpr_static_size.get_val();
-
-                                model_inverter.pr_static_size.set_to_first();
+                                if (mask.L_dH_ext) base_conf.L_dH_ext = model_inverter.L_dH_ext.get_val();
+                                model_inverter.L_sH_ext.set_to_first();
                                 do {
-                                    if (mask.pr_static_size) base_conf.pr_static_size=model_inverter.pr_static_size.get_val();
-
-                                    model_inverter.cr_static_size.set_to_first();
+                                    if (mask.L_sH_ext) base_conf.L_sH_ext = model_inverter.L_sH_ext.get_val();
+                                    model_inverter.L_gH_ext.set_to_first();
                                     do {
-                                        if (mask.cr_static_size) base_conf.cr_static_size=model_inverter.cr_static_size.get_val();
-
-                                        model_inverter.btr_static_size.set_to_first();
+                                        if (mask.L_gH_ext) base_conf.L_gH_ext = model_inverter.L_gH_ext.get_val();
+                                        model_inverter.L_dL_ext.set_to_first();
                                         do {
-                                            if (mask.btr_static_size) base_conf.btr_static_size=model_inverter.btr_static_size.get_val();
+                                            if (mask.L_dL_ext) base_conf.L_dL_ext = model_inverter.L_dL_ext.get_val();
+                                            model_inverter.L_sL_ext.set_to_first();
+                                            do {
+                                                if (mask.L_sL_ext) base_conf.L_sL_ext = model_inverter.L_sL_ext.get_val();
+                                                model_inverter.L_gL_ext.set_to_first();
+                                                do {
+                                                    if (mask.L_gL_ext) base_conf.L_gL_ext = model_inverter.L_gL_ext.get_val();
+                                                    model_inverter.L_Hwire.set_to_first();
+                                                    do {
+                                                        if (mask.L_Hwire) base_conf.L_Hwire = model_inverter.L_Hwire.get_val();
+                                                        model_inverter.L_Lwire.set_to_first();
+                                                        do {
+                                                            if (mask.L_Lwire) base_conf.L_Lwire = model_inverter.L_Lwire.get_val();
+                                                            ///////////////////////////////////////////////////////////
+                                                            // Inner loop                                            //
+                                                            // If all cache parameters are valid                     //
+                                                            if (base_conf.is_feasible()) space.push_back(base_conf); //
+                                                            ///////////////////////////////////////////////////////////
+                                                        } while ( (mask.L_Lwire)  && (model_inverter.L_Lwire.increase()));
+                                                    } while ( (mask.L_Hwire)  && (model_inverter.L_Hwire.increase()));
+                                                } while ( (mask.L_gL_ext) && (model_inverter.L_gL_ext.increase()));
+                                            } while ( (mask.L_sL_ext) && (model_inverter.L_sL_ext.increase()));
+                                        } while ( (mask.L_dL_ext) && (model_inverter.L_dL_ext.increase()));
+                                    } while ( (mask.L_gH_ext) && (model_inverter.L_gH_ext.increase()));
+                                } while ( (mask.L_sH_ext) && (model_inverter.L_sH_ext.increase()));
+                            } while ( (mask.L_dH_ext) && (model_inverter.L_dH_ext.increase()));
+                        } while ( (mask.L_g_pin)  && (model_inverter.L_g_pin.increase()));
+                    } while ( (mask.L_s_pin)  && (model_inverter.L_s_pin.increase()));
+                } while ( (mask.L_d_pin)  && (model_inverter.L_d_pin.increase()));
+            } while ( (mask.L_g_int)  && (model_inverter.L_g_int.increase()));
+        } while ( (mask.L_s_int)  && (model_inverter.L_s_int.increase()));
+    } while ( (mask.L_d_int)  && (model_inverter.L_d_int.increase()));
 
-                                            compiler.tcc_region.set_to_first();	//db
-                                            do{	//db
-                                                if (mask.tcc_region) base_conf.tcc_region=compiler.tcc_region.get_val();	//db
-                                                compiler.max_unroll_allowed.set_to_first();	//db
-                                                do{	//db
-                                                    if (mask.max_unroll_allowed) base_conf.max_unroll_allowed=compiler.max_unroll_allowed.get_val();	//db
-                                                    compiler.regroup_only.set_to_first();	//db
-                                                    do{	//db
-                                                        if (mask.regroup_only) base_conf.regroup_only=compiler.regroup_only.get_val();	//db
-                                                        compiler.do_classic_opti.set_to_first();	//db
-                                                        do{	//db
-                                                            if (mask.do_classic_opti) base_conf.do_classic_opti=compiler.do_classic_opti.get_val();	//db
-                                                            compiler.do_prepass_scalar_scheduling.set_to_first();	//db
-                                                            do{	//db
-                                                                if (mask.do_prepass_scalar_scheduling) base_conf.do_prepass_scalar_scheduling=compiler.do_prepass_scalar_scheduling.get_val();	//db
-                                                                compiler.do_postpass_scalar_scheduling.set_to_first();	//db
-                                                                do{	//db
-                                                                    if (mask.do_postpass_scalar_scheduling) base_conf.do_postpass_scalar_scheduling=compiler.do_postpass_scalar_scheduling.get_val();	//db
-                                                                    compiler.do_modulo_scheduling.set_to_first();	//db
-                                                                    do{	//db
-                                                                        if (mask.do_modulo_scheduling) base_conf.do_modulo_scheduling=compiler.do_modulo_scheduling.get_val();	//db
-                                                                        compiler.memvr_profiled.set_to_first();	//db
-                                                                        do{	//db
-                                                                            if (mask.memvr_profiled) base_conf.memvr_profiled=compiler.memvr_profiled.get_val();	//db
-
-                                                                            mem_hierarchy.L1D.size.set_to_first();
-                                                                            do {
-                                                                                if (mask.L1D_size) base_conf.L1D_size=mem_hierarchy.L1D.size.get_val();
-
-                                                                                mem_hierarchy.L1D.block_size.set_to_first();
-                                                                                do {
-                                                                                    if (mask.L1D_block) base_conf.L1D_block=mem_hierarchy.L1D.block_size.get_val();
-
-                                                                                    mem_hierarchy.L1D.associativity.set_to_first();
-                                                                                    do {
-                                                                                        if (mask.L1D_assoc) base_conf.L1D_assoc=mem_hierarchy.L1D.associativity.get_val();
-
-                                                                                        mem_hierarchy.L1I.size.set_to_first();
-                                                                                        do {
-                                                                                            if (mask.L1I_size) base_conf.L1I_size=mem_hierarchy.L1I.size.get_val();
-
-                                                                                            mem_hierarchy.L1I.block_size.set_to_first();
-                                                                                            do {
-                                                                                                if (mask.L1I_block) base_conf.L1I_block=mem_hierarchy.L1I.block_size.get_val();
-
-                                                                                                mem_hierarchy.L1I.associativity.set_to_first();
-                                                                                                do {
-                                                                                                    if (mask.L1I_assoc) base_conf.L1I_assoc=mem_hierarchy.L1I.associativity.get_val();
-
-                                                                                                    mem_hierarchy.L2U.size.set_to_first();
-                                                                                                    do {
-                                                                                                        if (mask.L2U_size) base_conf.L2U_size=mem_hierarchy.L2U.size.get_val();
-
-                                                                                                        mem_hierarchy.L2U.block_size.set_to_first();
-                                                                                                        do {
-                                                                                                            if (mask.L2U_block) base_conf.L2U_block=mem_hierarchy.L2U.block_size.get_val();
-
-                                                                                                            mem_hierarchy.L2U.associativity.set_to_first();
-                                                                                                            do {
-                                                                                                                if (mask.L2U_assoc) base_conf.L2U_assoc=mem_hierarchy.L2U.associativity.get_val();
-
-                                                                                                                //////////////////////////////////////////////////////////////////////////////////
-                                                                                                                //  inner loop
-
-                                                                                                                // if all cache parameters are valid
-                                                                                                                if (base_conf.is_feasible()) space.push_back(base_conf);
-
-                                                                                                                //////////////////////////////////////////////////////////////////////////////////
-                                                                                                            }while ( (mask.L2U_assoc)&&(mem_hierarchy.L2U.associativity.increase()));
-                                                                                                        }while ( (mask.L2U_block)&&(mem_hierarchy.L2U.block_size.increase() ));
-                                                                                                    }while ( (mask.L2U_size)&&(mem_hierarchy.L2U.size.increase()));
-                                                                                                }while ( (mask.L1I_assoc)&&(mem_hierarchy.L1I.associativity.increase()));
-                                                                                            }while ( (mask.L1I_block)&&(mem_hierarchy.L1I.block_size.increase() ));
-                                                                                        }while ( (mask.L1I_size)&&(mem_hierarchy.L1I.size.increase()));
-                                                                                    } while ( (mask.L1D_assoc)&&(mem_hierarchy.L1D.associativity.increase()));
-                                                                                } while ( (mask.L1D_block)&&(mem_hierarchy.L1D.block_size.increase() ));
-                                                                            } while ( (mask.L1D_size)&&(mem_hierarchy.L1D.size.increase()));
-                                                                        }while ( (mask.memvr_profiled)&&(compiler.memvr_profiled.increase()));	//db
-                                                                    }while ( (mask.do_modulo_scheduling)&&(compiler.do_modulo_scheduling.increase()));	//db
-                                                                }while ( (mask.do_postpass_scalar_scheduling)&&(compiler.do_postpass_scalar_scheduling.increase()));	//db
-                                                            }while ( (mask.do_prepass_scalar_scheduling)&&(compiler.do_prepass_scalar_scheduling.increase()));	//db
-                                                        }while ( (mask.do_classic_opti)&&(compiler.do_classic_opti.increase()));	//db
-                                                    }while ( (mask.regroup_only)&&(compiler.regroup_only.increase()));	//db
-                                                }while ( (mask.max_unroll_allowed)&&(compiler.max_unroll_allowed.increase()));	//db
-                                            }while ( (mask.tcc_region)&&(compiler.tcc_region.increase()));	//db
-                                        }while ( (mask.btr_static_size) && (model_inverter.btr_static_size.increase() ) );
-                                    }while ( (mask.cr_static_size) && (model_inverter.cr_static_size.increase() ) );
-                                }while ( (mask.pr_static_size) && (model_inverter.pr_static_size.increase() ) );
-                            } while ( (mask.fpr_static_size) && (model_inverter.fpr_static_size.increase() ) );
-                        } while ( (mask.gpr_static_size) && (model_inverter.gpr_static_size.increase() ) );
-                    } while ( (mask.branch_units) && (model_inverter.branch_units.increase()) );
-                } while ( (mask.memory_units) && (model_inverter.memory_units.increase()) ) ;
-            } while( (mask.float_units) && (model_inverter.float_units.increase()) );
-        } while ( (mask.integer_units) && (model_inverter.integer_units.increase() ));
-    } while ( (mask.num_clusters) && (model_inverter.num_clusters.increase() ));
-
- */
     return space;
 
 }
@@ -958,13 +907,38 @@ vector<Configuration> Explorer::build_space_cross_merge(const vector<Configurati
 
     for (unsigned int n1=0;n1<s1.size();n1++)
     {
-        // TODO M9DSE
-        //if (mask1.gpr_static_size) base_conf.gpr_static_size=s1[n1].gpr_static_size;
+        if (mask1.L_d_int ) base_conf.L_d_int  = s1[n1].L_d_int ;
+        if (mask1.L_s_int ) base_conf.L_s_int  = s1[n1].L_s_int ;
+        if (mask1.L_g_int ) base_conf.L_g_int  = s1[n1].L_g_int ;
+        if (mask1.L_d_pin ) base_conf.L_d_pin  = s1[n1].L_d_pin ;
+        if (mask1.L_s_pin ) base_conf.L_s_pin  = s1[n1].L_s_pin ;
+        if (mask1.L_g_pin ) base_conf.L_g_pin  = s1[n1].L_g_pin ;
+        if (mask1.L_dH_ext) base_conf.L_dH_ext = s1[n1].L_dH_ext;
+        if (mask1.L_sH_ext) base_conf.L_sH_ext = s1[n1].L_sH_ext;
+        if (mask1.L_gH_ext) base_conf.L_gH_ext = s1[n1].L_gH_ext;
+        if (mask1.L_dL_ext) base_conf.L_dL_ext = s1[n1].L_dL_ext;
+        if (mask1.L_sL_ext) base_conf.L_sL_ext = s1[n1].L_sL_ext;
+        if (mask1.L_gL_ext) base_conf.L_gL_ext = s1[n1].L_gL_ext;
+        if (mask1.L_Hwire ) base_conf.L_Hwire  = s1[n1].L_Hwire ;
+        if (mask1.L_Lwire ) base_conf.L_Lwire  = s1[n1].L_Lwire ;
 
         for(unsigned int n2=0;n2<s2.size();n2++)
         {
-            // TODO M9DSE
-            //if (mask2.gpr_static_size) base_conf.gpr_static_size=s2[n2].gpr_static_size;
+            if (mask2.L_d_int ) base_conf.L_d_int  = s2[n2].L_d_int ;
+            if (mask2.L_s_int ) base_conf.L_s_int  = s2[n2].L_s_int ;
+            if (mask2.L_g_int ) base_conf.L_g_int  = s2[n2].L_g_int ;
+            if (mask2.L_d_pin ) base_conf.L_d_pin  = s2[n2].L_d_pin ;
+            if (mask2.L_s_pin ) base_conf.L_s_pin  = s2[n2].L_s_pin ;
+            if (mask2.L_g_pin ) base_conf.L_g_pin  = s2[n2].L_g_pin ;
+            if (mask2.L_dH_ext) base_conf.L_dH_ext = s2[n2].L_dH_ext;
+            if (mask2.L_sH_ext) base_conf.L_sH_ext = s2[n2].L_sH_ext;
+            if (mask2.L_gH_ext) base_conf.L_gH_ext = s2[n2].L_gH_ext;
+            if (mask2.L_dL_ext) base_conf.L_dL_ext = s2[n2].L_dL_ext;
+            if (mask2.L_sL_ext) base_conf.L_sL_ext = s2[n2].L_sL_ext;
+            if (mask2.L_gL_ext) base_conf.L_gL_ext = s2[n2].L_gL_ext;
+            if (mask2.L_Hwire ) base_conf.L_Hwire  = s2[n2].L_Hwire ;
+            if (mask2.L_Lwire ) base_conf.L_Lwire  = s2[n2].L_Lwire ;
+
             // resulting combination of two configurations may result
             // in not feasible config
 
@@ -979,17 +953,25 @@ vector<Configuration> Explorer::build_space_cross_merge(const vector<Configurati
 ////////////////////////////////////////////////////////////////////////////
 bool Explorer::configuration_present(const Configuration& conf, const vector<Configuration>& space) const
 {
-
-    assert(false);
     if (space.size()==0) return false;
 
     for(unsigned int i = 0;i<space.size();i++)
     {
-        /* TODO: M9DSE
-        if(   (conf.gpr_static_size==space[i].gpr_static_size)
-              &&(conf.fpr_static_size==space[i].fpr_static_size)
-              */
-            return true;
+        if ((conf.L_d_int  == space[i].L_d_int )
+        &&  (conf.L_s_int  == space[i].L_s_int )
+        &&  (conf.L_g_int  == space[i].L_g_int )
+        &&  (conf.L_d_pin  == space[i].L_d_pin )
+        &&  (conf.L_s_pin  == space[i].L_s_pin )
+        &&  (conf.L_g_pin  == space[i].L_g_pin )
+        &&  (conf.L_dH_ext == space[i].L_dH_ext)
+        &&  (conf.L_sH_ext == space[i].L_sH_ext)
+        &&  (conf.L_gH_ext == space[i].L_gH_ext)
+        &&  (conf.L_dL_ext == space[i].L_dL_ext)
+        &&  (conf.L_sL_ext == space[i].L_sL_ext)
+        &&  (conf.L_gL_ext == space[i].L_gL_ext)
+        &&  (conf.L_Hwire  == space[i].L_Hwire )
+        &&  (conf.L_Lwire  == space[i].L_Lwire )
+        )   return true;
     }
 
     return false;
@@ -1027,11 +1009,23 @@ int Explorer::simulation_present(const Simulation& sim,const vector<Simulation>&
 ////////////////////////////////////////////////////////////////////////////
 Space_mask Explorer::mask_union(Space_mask& m1,Space_mask& m2) const
 {
-    assert(false);
     Space_mask mask;
-    /* TODO: M9DSE
-    mask.gpr_static_size = (m1.gpr_static_size) || (m2.gpr_static_size);
-     **/
+
+    mask.L_d_int  = (m1.L_d_int ) || (m2.L_d_int );
+    mask.L_s_int  = (m1.L_s_int ) || (m2.L_s_int );
+    mask.L_g_int  = (m1.L_g_int ) || (m2.L_g_int );
+    mask.L_d_pin  = (m1.L_d_pin ) || (m2.L_d_pin );
+    mask.L_s_pin  = (m1.L_s_pin ) || (m2.L_s_pin );
+    mask.L_g_pin  = (m1.L_g_pin ) || (m2.L_g_pin );
+    mask.L_dH_ext = (m1.L_dH_ext) || (m2.L_dH_ext);
+    mask.L_sH_ext = (m1.L_sH_ext) || (m2.L_sH_ext);
+    mask.L_gH_ext = (m1.L_gH_ext) || (m2.L_gH_ext);
+    mask.L_dL_ext = (m1.L_dL_ext) || (m2.L_dL_ext);
+    mask.L_sL_ext = (m1.L_sL_ext) || (m2.L_sL_ext);
+    mask.L_gL_ext = (m1.L_gL_ext) || (m2.L_gL_ext);
+    mask.L_Hwire  = (m1.L_Hwire ) || (m2.L_Hwire );
+    mask.L_Lwire  = (m1.L_Lwire ) || (m2.L_Lwire );
+
     return mask;
 
 }
@@ -1044,12 +1038,21 @@ long double Explorer::get_space_size(const Space_mask& mask) const
 {
     double size = 1;
 
-    //assert(false);
-    cout << "get_space_size FALSE" << endl;
+    if (mask.L_d_int ) size = size*(model_inverter.L_d_int.get_size());
+    if (mask.L_s_int ) size = size*(model_inverter.L_s_int.get_size());
+    if (mask.L_g_int ) size = size*(model_inverter.L_g_int.get_size());
+    if (mask.L_d_pin ) size = size*(model_inverter.L_d_pin.get_size());
+    if (mask.L_s_pin ) size = size*(model_inverter.L_s_pin.get_size());
+    if (mask.L_g_pin ) size = size*(model_inverter.L_g_pin.get_size());
+    if (mask.L_dH_ext) size = size*(model_inverter.L_dH_ext.get_size());
+    if (mask.L_sH_ext) size = size*(model_inverter.L_sH_ext.get_size());
+    if (mask.L_gH_ext) size = size*(model_inverter.L_gH_ext.get_size());
+    if (mask.L_dL_ext) size = size*(model_inverter.L_dL_ext.get_size());
+    if (mask.L_sL_ext) size = size*(model_inverter.L_sL_ext.get_size());
+    if (mask.L_gL_ext) size = size*(model_inverter.L_gL_ext.get_size());
+    if (mask.L_Hwire ) size = size*(model_inverter.L_Hwire.get_size());
+    if (mask.L_Lwire ) size = size*(model_inverter.L_Lwire.get_size());
 
-    /* TODO: M9DSE
-    if (mask.gpr_static_size) size = size*(model_inverter.gpr_static_size.get_size());
-     */
     return size;
 }
 
@@ -1263,9 +1266,21 @@ void Explorer::load_space_file(const string& filename)
 
 }
 
+string Explorer::get_space_file_line(Parameter param)
+{
+    std::ostringstream output_stringstream;
+
+    param.set_to_first();
+    output_stringstream << "\n" << param.get_label() << " ";
+    do { output_stringstream << param.get_val() << " "; } while (param.increase());
+    output_stringstream << "0";
+    output_stringstream << "\n DEFAULT " << param.get_default();
+
+    return output_stringstream.str();
+}
+
 void Explorer::save_space_file(const string& filename)
 {
-    assert(false);
     std::ofstream output_file(filename.c_str());
     if (!output_file)
     {
@@ -1278,18 +1293,21 @@ void Explorer::save_space_file(const string& filename)
     else
     {
         output_file << "\n\n [BEGIN_SPACE]";
-
-        /* TODO M9DSE
-        model_inverter.integer_units.set_to_first();
-
-        output_file << "\ninteger_units ";
-        do { output_file << model_inverter.integer_units.get_val() << " "; } while (model_inverter.integer_units.increase());
-        output_file << "0";
-        output_file << "\n DEFAULT " << model_inverter.integer_units.get_default();
-         ****/
-
+        output_file << get_space_file_line(model_inverter.L_d_int);
+        output_file << get_space_file_line(model_inverter.L_s_int);
+        output_file << get_space_file_line(model_inverter.L_g_int);
+        output_file << get_space_file_line(model_inverter.L_d_pin);
+        output_file << get_space_file_line(model_inverter.L_s_pin);
+        output_file << get_space_file_line(model_inverter.L_g_pin);
+        output_file << get_space_file_line(model_inverter.L_dH_ext);
+        output_file << get_space_file_line(model_inverter.L_sH_ext);
+        output_file << get_space_file_line(model_inverter.L_gH_ext);
+        output_file << get_space_file_line(model_inverter.L_dL_ext);
+        output_file << get_space_file_line(model_inverter.L_sL_ext);
+        output_file << get_space_file_line(model_inverter.L_gL_ext);
+        output_file << get_space_file_line(model_inverter.L_Hwire);
+        output_file << get_space_file_line(model_inverter.L_Lwire);
         output_file << "\n\n [END_SPACE]";
-
     }
 
 }

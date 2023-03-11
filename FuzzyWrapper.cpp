@@ -53,42 +53,56 @@ bool CFuzzyFunctionApproximation::Learn(const Configuration& conf,const Dynamic_
 }
 
 bool CFuzzyFunctionApproximation::Learn(Configuration conf, Simulation sim, ModelInverter &p) {
-	double appoggio[20];
-	assert(false);
-	// TODO M9FIX
-	/*
-	appoggio[0] = double(p.L_s_int.get_pos(conf.integer_units));
-	appoggio[17] = double(mem.L2U.associativity.get_pos(conf.L2U_assoc));
-	appoggio[18] = double(sim.avg_err_VGS);
-	appoggio[19] = double(sim.avg_err_VDS);
-	 */
-	return (Learn(appoggio,&(appoggio[18])));
+	double appoggio[17];
+
+    appoggio[0]  = double(p.L_d_int.get_pos(conf.L_d_int));
+    appoggio[1]  = double(p.L_s_int.get_pos(conf.L_s_int));
+    appoggio[2]  = double(p.L_g_int.get_pos(conf.L_g_int));
+    appoggio[3]  = double(p.L_d_pin.get_pos(conf.L_d_pin));
+    appoggio[4]  = double(p.L_s_pin.get_pos(conf.L_s_pin));
+    appoggio[5]  = double(p.L_g_pin.get_pos(conf.L_g_pin));
+    appoggio[6]  = double(p.L_dH_ext.get_pos(conf.L_dH_ext));
+    appoggio[7]  = double(p.L_sH_ext.get_pos(conf.L_sH_ext));
+    appoggio[8]  = double(p.L_gH_ext.get_pos(conf.L_gH_ext));
+    appoggio[9]  = double(p.L_dL_ext.get_pos(conf.L_dL_ext));
+    appoggio[10] = double(p.L_sL_ext.get_pos(conf.L_sL_ext));
+    appoggio[11] = double(p.L_gL_ext.get_pos(conf.L_gL_ext));
+    appoggio[12] = double(p.L_Hwire.get_pos(conf.L_Hwire));
+    appoggio[13] = double(p.L_Lwire.get_pos(conf.L_Lwire));
+    appoggio[14] = double(sim.avg_err_VGS);
+    appoggio[15] = double(sim.avg_err_VDS);
+    appoggio[16] = double(sim.avg_err_ID);
+
+	return (Learn(appoggio,&(appoggio[14])));
 }
 
 Simulation CFuzzyFunctionApproximation::Estimate1(Configuration conf, ModelInverter &p) {
 	Simulation sim;
-	double appoggio[20];
-	// TODO M9FIX
-	assert(false);
-	/*
-	appoggio[0] = double(p.L_s_int.get_pos(conf.integer_units));
-	appoggio[1] = double(p.L_g_int.get_pos(conf.float_units));
-	appoggio[2] = double(p.L_d_pin.get_pos(conf.branch_units));
-	appoggio[3] = double(p.L_s_pin.get_pos(conf.memory_units));
-	appoggio[4] = double(p.L_g_pin.get_pos(conf.gpr_static_size));
-	appoggio[5] = double(p.L_dH_ext.get_pos(conf.fpr_static_size));
-	appoggio[6] = double(p.L_sH_ext.get_pos(conf.pr_static_size));
-	appoggio[7] = double(p.L_gH_ext.get_pos(conf.cr_static_size));
-	appoggio[8] = double(p.L_dL_ext.get_pos(conf.btr_static_size));
-	appoggio[17] = double(mem.L2U.associativity.get_pos(conf.L2U_assoc));
-	appoggio[18] = 0.0f;
-	appoggio[19] = 0.0f;
-	 */
-	EstimateG(appoggio,&(appoggio[18]));
+	double appoggio[17];
+
+    appoggio[0]  = double(p.L_d_int.get_pos(conf.L_d_int));
+    appoggio[1]  = double(p.L_s_int.get_pos(conf.L_s_int));
+    appoggio[2]  = double(p.L_g_int.get_pos(conf.L_g_int));
+    appoggio[3]  = double(p.L_d_pin.get_pos(conf.L_d_pin));
+    appoggio[4]  = double(p.L_s_pin.get_pos(conf.L_s_pin));
+    appoggio[5]  = double(p.L_g_pin.get_pos(conf.L_g_pin));
+    appoggio[6]  = double(p.L_dH_ext.get_pos(conf.L_dH_ext));
+    appoggio[7]  = double(p.L_sH_ext.get_pos(conf.L_sH_ext));
+    appoggio[8]  = double(p.L_gH_ext.get_pos(conf.L_gH_ext));
+    appoggio[9]  = double(p.L_dL_ext.get_pos(conf.L_dL_ext));
+    appoggio[10] = double(p.L_sL_ext.get_pos(conf.L_sL_ext));
+    appoggio[11] = double(p.L_gL_ext.get_pos(conf.L_gL_ext));
+    appoggio[12] = double(p.L_Hwire.get_pos(conf.L_Hwire));
+    appoggio[13] = double(p.L_Lwire.get_pos(conf.L_Lwire));
+    appoggio[14] = 0.0f;
+    appoggio[15] = 0.0f;
+    appoggio[16] = 0.0f;
+
+	EstimateG(appoggio,&(appoggio[14]));
 	sim.config = conf;
-	sim.avg_err_ID = -1.0f;
-	sim.avg_err_VGS = double(appoggio[18]);
-	sim.avg_err_VDS = double(appoggio[19]);
+	sim.avg_err_VGS = double(appoggio[14]);
+	sim.avg_err_VDS = double(appoggio[15]);
+    sim.avg_err_ID = -1.0f; // TODO: M9 Check this
 	sim.simulated = false;
 	cout << "\n-----------Estimate 1 : " << sim.avg_err_VGS << " __ " << sim.avg_err_VDS;
 	return (sim);

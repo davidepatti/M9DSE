@@ -85,6 +85,7 @@ int UserInterface::show_menu()
 
 		cout << "\n [g] - Genetic based (GA)";
 		cout << "\n [s] - Sensivity analysis (SAP)";
+        cout << "\n [p] - Pareto Sensivity analysis (PBSA)";
 		cout << "\n [e] - Exhaustive (EXHA)";
 		cout << "\n [r] - Random (RANDOM)";
 		cout << "\n [t] - run Explorer::test() code";
@@ -155,6 +156,14 @@ int UserInterface::show_menu()
 			}
 			break;
 
+        case 'p':
+            if (myrank == 0) {
+                start_exploration_message();
+                cout << "\n\n Start exploration (y/n) ? ";
+                cin >> ch;
+                if (ch=='y') my_explorer->start_PBSA();
+            }
+            break;
 
 		case 'e':
 
@@ -368,13 +377,10 @@ void UserInterface::set_subspace_wrapper()
 void UserInterface::reload_system_config()
 {
     cout << "RELOADING SYSTEM CONFIG (false)" << endl;
-    // TODO M9DSE
-    /*
-	string filename = base_path+"/matlab-workspace/M9-explorer/step_by_step/machines/";
+
+	string filename = base_path + "/matlab-workspace/M9-explorer/step_by_step/machines/space.conf";
 	cout << "\n\n Loading model_inverter configuration: " << filename;
     matlab_interface->load_model_config(&(my_explorer->model_inverter), filename);
-     */
-
 }
 
 
