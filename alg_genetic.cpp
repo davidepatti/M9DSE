@@ -168,16 +168,23 @@ void Explorer::GA_evaluate(population* pop)
 {
     vector<Configuration> vconf;
     vector<int> indexes;
-    vector<Simulation> vsim(pop->size());
-    vconf.reserve(pop->size());
-    indexes.reserve(pop->size());
+    vector<Simulation> vsim(pop->size()+2);
+    vconf.reserve(pop->size()+2);
+    indexes.reserve(pop->size()+2);
 
     string logfile = get_base_dir()+string(M9DSE_LOG_FILE);
     int myrank = get_mpi_rank();
 
-    for(int index=0; index < pop->size(); index++)
+    for(int index=0; index < pop->size() + 2; index++)
     {
-        Configuration conf = ind2conf(pop->at(index));
+        Configuration conf;
+
+	if (index < pop->size()) {
+            conf = ind2conf(pop->at(index));
+	} else {
+	    conf = create_configuration();
+	}
+
         Simulation sim;
         sim.config = conf;
 
